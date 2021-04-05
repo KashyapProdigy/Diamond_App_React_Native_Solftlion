@@ -45,7 +45,6 @@ export default class Splash extends React.Component {
       this.onNotificationClick = this.onNotificationClick.bind(this);
       this.onSettingClick = this.onSettingClick.bind(this);
       this.onUpdateProfileClick = this.onUpdateProfileClick.bind(this);
-      this.onProfilePictureClick = this.onProfilePictureClick.bind(this);
       this.onCompanyAddClick = this.onCompanyAddClick.bind(this);
       this.onCompanyEditClick = this.onCompanyEditClick.bind(this);
       this.onCompanySubmitClick = this.onCompanySubmitClick.bind(this);
@@ -55,7 +54,7 @@ export default class Splash extends React.Component {
 
 
     onNotificationClick(){
-        this.props.navigation.navigate('ProfieSeeker');
+        this.props.navigation.navigate('ProfileSeeker');
     }
 
     onSettingClick(){
@@ -63,23 +62,45 @@ export default class Splash extends React.Component {
     }
 
     onUpdateProfileClick(){
-        this.props.navigation.navigate('ProfieSeeker');
+        this.props.navigation.navigate('ProfileSeeker');
     }
 
-    onProfilePictureClick(){
-        this.props.navigation.navigate('ProfieSeeker');
+    onProfilePictureClick = () => {
+        let options = {
+          storageOptions: {
+            skipBackup: true,
+            path: 'images',
+          },
+        };
+    
+        launchImageLibrary(options, (res) => {
+          console.log('Response = ', res);
+    
+          if (res.didCancel) {
+            console.log('User cancelled image picker');
+          } else if (res.error) {
+            console.log('ImagePicker Error: ', res.error);
+          } else {
+            const source = { uri: res.uri };
+            console.log('response', JSON.stringify(res));
+            this.setState({
+              imageURI: res.uri
+            });
+          }
+        });
     }
+
 
     onCompanyAddClick(){
-        this.props.navigation.navigate('ProfieSeeker');
+        this.props.navigation.navigate('ProfileSeeker');
     }
 
     onCompanyEditClick(){
-        this.props.navigation.navigate('ProfieSeeker');
+        this.props.navigation.navigate('ProfileSeeker');
     }
 
     onCompanySubmitClick(){
-        this.props.navigation.navigate('ProfieSeeker');
+        this.props.navigation.navigate('ProfileSeeker');
     }
 
     render () {
@@ -123,7 +144,12 @@ export default class Splash extends React.Component {
                 justifyContent: 'center',
                 alignItems: 'center',
                 top:95}}>
-            <Image source={require('../../assets/image/dummy_avatar.png')} style={{height:150,width:150,}} resizeMode='contain'></Image>
+                {
+                    this.state.imageURI == null || this.state.imageURI == "" ?
+                    <Image source={require('../../assets/image/dummy_avatar.png')} style={{height:150,width:150,borderRadius:75}} resizeMode='contain'></Image>
+                    :
+                    <Image source={{uri: `${this.state.imageURI}`}} style={{height:150,width:150,borderRadius:150/2}} />
+                }    
             </TouchableOpacity>
             </View>
 

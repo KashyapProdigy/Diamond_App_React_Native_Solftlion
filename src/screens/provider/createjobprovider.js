@@ -20,9 +20,9 @@ import {
   import Icon6 from 'react-native-vector-icons/Ionicons';
   import Icon7 from 'react-native-vector-icons/EvilIcons';
 
-//   import ImagePicker from 'react-native-image-crop-picker';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-  import { CheckBox } from 'react-native-elements'
+  import {Picker} from '@react-native-picker/picker';
+  import { launchImageLibrary} from 'react-native-image-picker';
+  import { CheckBox } from 'react-native-elements';
 
 
 export default class Splash extends React.Component {
@@ -69,28 +69,30 @@ export default class Splash extends React.Component {
         this.props.navigation.navigate('HomeProvider');
     }
 
-    onChooseImageClick(){
+    onChooseImageClick = () => {
 
-        // ImagePicker.openPicker({
-        //     height:800,
-        //     width:800,
-        //     cropping:true,
-        //     includeBase64:true,
-        //     minFiles:1,
-        //     maxFiles:1,
-        //     mediaType:'photo',
-        //     cropperActiveWidgetColor:"#4F45F0",
-        //     cropperStatusBarColor:"#4F45F0",
-        //     cropperToolbarColor:"#976ecc",
-        //     cropperToolbarTitle:"Crop Photo",
-        //     compressImageQuality:1
-        //   }).then(images => {
-        //     let base64 = images.data;
-        //     let filename = images.path.substring(images.path.lastIndexOf('/')+ 1, images.path.lenght);
-
-        //     this.updateProfilePic(base64);
-        //   })
-
+            let options = {
+              storageOptions: {
+                skipBackup: true,
+                path: 'images',
+              },
+            };
+        
+            launchImageLibrary(options, (res) => {
+              console.log('Response = ', res);
+        
+              if (res.didCancel) {
+                console.log('User cancelled image picker');
+              } else if (res.error) {
+                console.log('ImagePicker Error: ', res.error);
+              } else {
+                const source = { uri: res.uri };
+                console.log('response', JSON.stringify(res));
+                this.setState({
+                  imageURI: res.uri
+                });
+              }
+            });
     }
 
     onSaveCheckBoxToggle(){
@@ -132,13 +134,19 @@ export default class Splash extends React.Component {
                 <Text style={{fontSize:18}}>Category</Text>
             </View>
             <View style={styles.iconInputContainer}>
-            <TextInput style = {styles.iconInputField}
-                underlineColorAndroid = "transparent"
-                placeholder = "Category"
-                placeholderTextColor = "#0000005a"
-                autoCapitalize = "none"
-                value={this.state.category}
-                onChangeText={(category) => this.setState({category})}  />
+            <Picker
+                style = {styles.iconInputField}
+                selectedValue={this.state.category}
+                enabled={true}
+                dropdownIconColor={'#4F45F0'}
+                onValueChange={(category) => this.setState({category: category})}
+            >
+               <Picker.Item label={'Grader'} value={'grader'} key={1}/>
+               <Picker.Item label={'Shiner'} value={'grader'} key={2}/>
+               <Picker.Item label={'4p'} value={'grader'} key={3}/>
+               <Picker.Item label={'Fancy'} value={'grader'} key={4}/>
+               <Picker.Item label={'Office Staff'} value={'grader'} key={5}/>
+            </Picker>
             </View>
 
             <View style={{marginHorizontal:20,marginTop:15}}>
@@ -198,13 +206,16 @@ export default class Splash extends React.Component {
                 <Text style={{fontSize:18}}>Employment Type</Text>
             </View>
             <View style={styles.iconInputContainer}>
-            <TextInput style = {styles.iconInputField}
-                underlineColorAndroid = "transparent"
-                placeholder = "Employment Type"
-                placeholderTextColor = "#0000005a"
-                autoCapitalize = "none"
-                value={this.state.emptype}
-                onChangeText={(emptype) => this.setState({emptype})}  />
+            <Picker
+                style = {styles.iconInputField}
+                selectedValue={this.state.emptype}
+                enabled={true}
+                dropdownIconColor={'#4F45F0'}
+                onValueChange={(emptype) => this.setState({emptype: emptype})}
+            >
+               <Picker.Item label={'Full Time'} value={'grader'} key={1}/>
+               <Picker.Item label={'Part Time'} value={'grader'} key={2}/>
+            </Picker>
             </View>
 
             <View style={{marginHorizontal:20,marginTop:15}}>

@@ -8,7 +8,8 @@ import {
     Image,
     FlatList,
     Dimensions, 
-    TouchableOpacity
+    TouchableOpacity,
+    Alert
   } from 'react-native';
 
   import Icon1 from 'react-native-vector-icons/Entypo';
@@ -86,15 +87,15 @@ export default class Splash extends React.Component {
                 id: 6
             },
         ],
-          toggleOptionsVisibility:true,
-          toggleCardID:0,
+          toggleOptionsVisibility:false,
+          toggleCardID:null,
           loading:false,
       };
 
       this.onFilterClick = this.onFilterClick.bind(this);
       this.onNotificationClick = this.onNotificationClick.bind(this);
       this.onSettingClick = this.onSettingClick.bind(this);
-      this.onOptionsClick = this.onOptionsClick.bind(this);
+      this.onOptionClick = this.onOptionClick.bind(this);
       this.onDeactivatePostClick = this.onDeactivatePostClick.bind(this);
       this.onDeletePostClick = this.onDeletePostClick.bind(this);
       this.onEmployeeAppliedClick = this.onEmployeeAppliedClick.bind(this);
@@ -116,36 +117,73 @@ export default class Splash extends React.Component {
         this.props.navigation.navigate('SettingProvider');
     }
 
-    onOptionsClick(){
-        if(this.state.toggleOptionsVisibility){
-            this.setState({toggleOptionsVisibility:false,toggleCardID:0})
-        }else{
-            this.setState({toggleOptionsVisibility:true})
+    onOptionClick(paramid){
+        if(this.state.toggleOptionsVisibility == false && this.state.toggleCardID == null){
+            this.setState({toggleCardID:paramid,toggleOptionsVisibility:true,})
+            return
+        }
+        if(this.state.toggleOptionsVisibility == true && this.state.toggleCardID != null && this.state.toggleCardID != paramid){
+            this.setState({toggleCardID:paramid,toggleOptionsVisibility:true})
+            return
+        }
+        if(this.state.toggleOptionsVisibility == true && this.state.toggleCardID != null){
+            this.setState({toggleCardID:null,toggleOptionsVisibility:false})
+            return
         }
     }
 
     onDeactivatePostClick(){
-        if(this.state.toggleOptionsVisibility){
-            this.setState({toggleOptionsVisibility:false})
-        }else{
-            this.setState({toggleOptionsVisibility:true})
-        }
+        this.setState({toggleCardID:null,toggleOptionsVisibility:false,})
+        Alert.alert(
+            'Deactivate Post',
+            'want to deactivate this job post ?',
+            [
+              {text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+              {text: 'Yes', onPress: () =>  this.deactivateJobPost()},
+            ],
+            {cancelable: false},
+          );
     }
 
     onDeletePostClick(){
-        if(this.state.toggleOptionsVisibility){
-            this.setState({toggleOptionsVisibility:false})
-        }else{
-            this.setState({toggleOptionsVisibility:true})
-        }
+        this.setState({toggleCardID:null,toggleOptionsVisibility:false,})
+        Alert.alert(
+            'Delete Post',
+            'want to delete this job post ?',
+            [
+              {text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+              {text: 'Yes', onPress: () =>  this.deleteJobPost()},
+            ],
+            {cancelable: false},
+          );
     }
  
     onEmployeeAppliedClick(){
-        this.props.navigation.navigate('ActiveJobProvider');
+        this.props.navigation.navigate('EmployeeApplied');
     }
 
     onCloseRecruitmentClick(){
-        this.props.navigation.navigate('ActiveJobProvider');
+        Alert.alert(
+            'Close Recruitment',
+            'want to close recruitment for this job ?',
+            [
+              {text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+              {text: 'Yes', onPress: () =>  this.closeRecruitment()},
+            ],
+            {cancelable: false},
+          );
+    }
+
+    deleteJobPost(){
+        this.props.navigation.navigate('AllJobProvider');
+    }
+
+    deactivateJobPost(){
+        this.props.navigation.navigate('AllJobProvider');
+    }
+
+    closeRecruitment(){
+        this.props.navigation.navigate('AllJobProvider');
     }
 
     render () {
@@ -194,14 +232,8 @@ export default class Splash extends React.Component {
                                     <Text style={{marginTop:6}}>{item.company}</Text>
                                 </View >
                                 <View>
-                                <TouchableOpacity onPress={()=>{
-                                    if(this.state.toggleOptionsVisibility){
-                                        this.setState({toggleOptionsVisibility:false,toggleCardID:item.id})
-                                    }
-                                    else{
-                                        this.setState({toggleOptionsVisibility:true,toggleCardID:item.id})
-                                    }    
-                                    }} style={{paddingVertical:10,paddingHorizontal:10}}>
+                                <TouchableOpacity onPress={()=>this.onOptionClick(item.id)} 
+                                    style={{paddingVertical:10,paddingHorizontal:10}}>
                                     <Icon8 name="options-vertical"color={'#4F45F0'} size={28} />
                                 </TouchableOpacity>
                                 {this.state.toggleOptionsVisibility && (this.state.toggleCardID == item.id) ?

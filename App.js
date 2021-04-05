@@ -39,6 +39,7 @@ import RateApp from './src/screens/common/rateapp';
   import MainTabProvider from './src/screens/provider/maintabprovider';
   import SettingProvider from './src/screens/provider/settingprovider';
   import CreateJobProvider from './src/screens/provider/createjobprovider';
+  import EmployeeApplied from './src/screens/provider/employeeapllied';
 
 /**
  * Seller Imports For Root Stack
@@ -78,6 +79,7 @@ const App = () =>{
         <RootStack.Screen name="MainTabProvider" component={MainTabProvider} />
         <RootStack.Screen name="SettingProvider" component={SettingProvider} />
         <RootStack.Screen name="CreateJobProvider" component={CreateJobProvider} />
+        <RootStack.Screen name="EmployeeApplied" component={EmployeeApplied} />
 
 
       </RootStack.Navigator>

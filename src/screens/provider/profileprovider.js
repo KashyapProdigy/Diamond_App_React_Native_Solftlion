@@ -20,6 +20,8 @@ import {
   import Icon6 from 'react-native-vector-icons/Ionicons';
   import Icon7 from 'react-native-vector-icons/EvilIcons';
 
+  import { launchImageLibrary} from 'react-native-image-picker';
+
 export default class Splash extends React.Component {
     constructor (props) {
       super(props);
@@ -37,13 +39,13 @@ export default class Splash extends React.Component {
           cwebsite:'',
           cemail:'',
           cmobile:'',
+          imageURI:null,
 
           loading:false,
       };
 
       this.onNotificationClick = this.onNotificationClick.bind(this);
       this.onSettingClick = this.onSettingClick.bind(this);
-      this.onProfilePictureClick = this.onProfilePictureClick.bind(this);
       this.onUpdateProfileClick = this.onUpdateProfileClick.bind(this);
 
     }
@@ -52,19 +54,41 @@ export default class Splash extends React.Component {
 
 
     onNotificationClick(){
-        this.props.navigation.navigate('ProfieSeeker');
+        this.props.navigation.navigate('ProfileProvider');
     }
 
     onSettingClick(){
-        this.props.navigation.navigate('SettingSeeker');
-    }
-
-    onProfilePictureClick(){
-        this.props.navigation.navigate('ProfieSeeker');
+        this.props.navigation.navigate('SettingProvider');
     }
 
     onUpdateProfileClick(){
-        this.props.navigation.navigate('ProfieSeeker');
+        this.props.navigation.navigate('ProfileProvider');
+    }
+
+    onProfilePictureClick = () => {
+
+        let options = {
+          storageOptions: {
+            skipBackup: true,
+            path: 'images',
+          },
+        };
+    
+        launchImageLibrary(options, (res) => {
+          console.log('Response = ', res);
+    
+          if (res.didCancel) {
+            console.log('User cancelled image picker');
+          } else if (res.error) {
+            console.log('ImagePicker Error: ', res.error);
+          } else {
+            const source = { uri: res.uri };
+            console.log('response', JSON.stringify(res));
+            this.setState({
+              imageURI: res.uri
+            });
+          }
+        });
     }
 
     render () {
@@ -108,7 +132,12 @@ export default class Splash extends React.Component {
                 justifyContent: 'center',
                 alignItems: 'center',
                 top:95}}>
-            <Image source={require('../../assets/image/dummy_avatar.png')} style={{height:150,width:150,}} resizeMode='contain'></Image>
+                {
+                    this.state.imageURI == null || this.state.imageURI == "" ?
+                    <Image source={require('../../assets/image/dummy_avatar.png')} style={{height:150,width:150,borderRadius:75}} resizeMode='contain'></Image>
+                    :
+                    <Image source={{uri: `${this.state.imageURI}`}} style={{height:150,width:150,borderRadius:150/2}} />
+                }    
             </TouchableOpacity>
             </View>
 

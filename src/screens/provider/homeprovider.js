@@ -21,8 +21,8 @@ import {
   import Icon5 from 'react-native-vector-icons/AntDesign';
   import Icon6 from 'react-native-vector-icons/Ionicons';
   import Icon7 from 'react-native-vector-icons/EvilIcons';
-  import Icon8 from 'react-native-vector-icons/Fontisto';
-  import Icon9 from 'react-native-vector-icons/Octicons';
+  import Icon8 from 'react-native-vector-icons/SimpleLineIcons';
+  import Icon9 from 'react-native-vector-icons/Fontisto';
 
 export default class Splash extends React.Component {
     constructor (props) {
