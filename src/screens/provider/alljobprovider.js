@@ -9,7 +9,8 @@ import {
     FlatList,
     Dimensions, 
     TouchableOpacity,
-    Alert
+    Alert,
+    StatusBar
   } from 'react-native';
 
   import Icon1 from 'react-native-vector-icons/Entypo';
@@ -197,6 +198,10 @@ export default class Splash extends React.Component {
     render () {
       return (
         <View style={styles.maincontainer}>
+        <StatusBar
+           backgroundColor = "#4F45F0"
+           barStyle = "light-content"
+         />
         <ImageBackground source={require('../../assets/image/splash_bg.png')} style={styles.backgroundImage} resizeMode='stretch' >
         <View style={{backgroundColor : '#4F45F0' , flex:8}}>
 
@@ -234,7 +239,7 @@ export default class Splash extends React.Component {
                         
                         <View style={{borderRadius:15,borderWidth:0.5,marginTop:10,backgroundColor:'#0000000a'}}>
                             <View style={{flexDirection:'row'}}>
-                                <View style={{marginVertical:10,marginLeft:20}}><Icon4 name="user" color={'#4F45F0'} size={60} /></View>
+                                <View style={{marginVertical:10,marginLeft:20}}><Icon4 name="user" color={'#4F45F0'} size={48} /></View>
                                 <View style={{marginVertical:10,marginLeft:30,width:'60%'}}> 
                                     <Text style={{fontSize:18,fontWeight:'bold'}}>{item.title}</Text>
                                     <Text style={{marginTop:6}}>{item.company}</Text>
@@ -242,7 +247,7 @@ export default class Splash extends React.Component {
                                 <View>
                                 <TouchableOpacity onPress={()=>this.onOptionClick(item.id)}  
                                 style={{paddingVertical:10,paddingHorizontal:10}}>
-                                    <Icon8 name="options-vertical" color={'#4F45F0'} size={28} />
+                                    <Icon8 name="options-vertical" color={'#4F45F0'} size={26} />
                                 </TouchableOpacity>
                                 {this.state.toggleOptionsVisibility && (this.state.toggleCardID == item.id) ?
                                 <View style={{backgroundColor:'#ffffff5a',right:15,top:55,justifyContent:'center',alignItems:'center',borderRadius:12,width:130,borderWidth:0.8,position:"absolute"}}>
@@ -282,7 +287,7 @@ export default class Splash extends React.Component {
                             <View style={{flexDirection:'row',marginLeft:20,marginTop:25,marginBottom:15,alignItems:'center',justifyContent:'space-between'}}>
                                 <View style={{flexDirection:'row',alignItems:'center'}}>
                                 <Text style={{marginLeft:5,color:'#000',fontWeight:"900"}}>Status : </Text>
-                                <View style={{padding:15,alignItems:'center',borderRadius:10,backgroundColor:(item.status == 'Open') ? '#9af5a56a' : '#0000003a'}}>
+                                <View style={{padding:13,alignItems:'center',borderRadius:10,backgroundColor:(item.status == 'Open') ? '#9af5a56a' : '#0000003a'}}>
                                     <Text style={{color:(item.status == 'Open') ? '#15d12c' : '#000000',fontWeight:"900"}}>{item.status}</Text>
                                 </View>
                                 </View>

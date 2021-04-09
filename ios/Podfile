@@ -14,6 +14,8 @@ target 'Dimand' do
 
   pod 'react-native-image-crop-picker', :path => '../node_modules/react-native-image-crop-picker'
 
+  pod 'react-native-appearance', :path => '../node_modules/react-native-appearance'
+
   target 'DimandTests' do
     inherit! :complete
     # Pods for testing

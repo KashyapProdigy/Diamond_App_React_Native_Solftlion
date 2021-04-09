@@ -7,7 +7,8 @@ import {
     ImageBackground,
     Image,
     Dimensions, 
-    TouchableOpacity
+    TouchableOpacity,
+    StatusBar
   } from 'react-native';
 
 
@@ -33,6 +34,10 @@ export default class Splash extends React.Component {
     render () {
       return (
         <View style={styles.maincontainer}>
+        <StatusBar
+           backgroundColor = "#4F45F0"
+           barStyle = "light-content"
+         />
         <ImageBackground source={require('../../assets/image/splash_bg.png')} style={styles.backgroundImage} resizeMode='stretch' >
         <View style={styles.subcontainer1}>
             <Text style={styles.pageheader}>Forgot Password ?</Text>

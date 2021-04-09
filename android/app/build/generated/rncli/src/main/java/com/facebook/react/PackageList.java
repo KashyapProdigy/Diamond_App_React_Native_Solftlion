@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import org.reactnative.maskedview.RNCMaskedViewPackage;
 // @react-native-picker/picker
 import com.reactnativecommunity.picker.RNCPickerPackage;
+// react-native-appearance
+import io.expo.appearance.RNCAppearancePackage;
 // react-native-gesture-handler
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 // react-native-image-picker
@@ -74,6 +76,7 @@ public class PackageList {
       new MainReactPackage(mConfig),
       new RNCMaskedViewPackage(),
       new RNCPickerPackage(),
+      new RNCAppearancePackage(),
       new RNGestureHandlerPackage(),
       new ImagePickerPackage(),
       new ReanimatedPackage(),

@@ -9,7 +9,8 @@ import {
     FlatList,
     Dimensions, 
     TouchableOpacity,
-    ScrollView
+    ScrollView,
+    StatusBar
   } from 'react-native';
 
   import Icon1 from 'react-native-vector-icons/Entypo';
@@ -20,9 +21,11 @@ import {
   import Icon6 from 'react-native-vector-icons/Ionicons';
   import Icon7 from 'react-native-vector-icons/EvilIcons';
 
+  import DropDownPicker from 'react-native-dropdown-picker';
   import {Picker} from '@react-native-picker/picker';
   import { launchImageLibrary} from 'react-native-image-picker';
   import { CheckBox } from 'react-native-elements';
+  import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 
 export default class Splash extends React.Component {
@@ -103,8 +106,11 @@ export default class Splash extends React.Component {
     render () {
       return (
         <View style={styles.maincontainer}>
-        <ImageBackground source={require('../../assets/image/splash_bg.png')} style={styles.backgroundImage} resizeMode='stretch' >
-        <View style={{backgroundColor : '#4F45F0' , flex:8}}>
+        <StatusBar
+           backgroundColor = "#4F45F0"
+           barStyle = "light-content"
+         />
+        <View style={{backgroundColor : '#4F45F0' , flex:0.1}}>
 
             <View style={{flexDirection:'row',justifyContent:'space-between'}}>
 
@@ -124,17 +130,15 @@ export default class Splash extends React.Component {
 
         </View>
         
-        <View style={{ flex:92 }}>
-            <ScrollView style={{flex:1,}}
-            contentContainerStyle={{paddingBottom:50}}
-            showsVerticalScrollIndicator={false}
-            >
+        <KeyboardAwareScrollView style={{flex:1,backgroundColor:"#fff"}} extraHeight={100} enableOnAndroid>
+        <ImageBackground source={require('../../assets/image/splash_bg.png')} style={styles.backgroundImage} resizeMode='stretch' >
 
             <View style={{marginHorizontal:20,marginTop:15}}>
-                <Text style={{fontSize:18}}>Category</Text>
+                <Text style={{fontSize:18}}>Category</Text> 
             </View>
             <View style={styles.iconInputContainer}>
             <Picker
+                mode="dropdown"
                 style = {styles.iconInputField}
                 selectedValue={this.state.category}
                 enabled={true}
@@ -142,10 +146,10 @@ export default class Splash extends React.Component {
                 onValueChange={(category) => this.setState({category: category})}
             >
                <Picker.Item label={'Grader'} value={'grader'} key={1}/>
-               <Picker.Item label={'Shiner'} value={'grader'} key={2}/>
-               <Picker.Item label={'4p'} value={'grader'} key={3}/>
-               <Picker.Item label={'Fancy'} value={'grader'} key={4}/>
-               <Picker.Item label={'Office Staff'} value={'grader'} key={5}/>
+               <Picker.Item label={'Shiner'} value={'shiner'} key={2}/>
+               <Picker.Item label={'4p'} value={'4p'} key={3}/>
+               <Picker.Item label={'Fancy'} value={'fancy'} key={4}/>
+               <Picker.Item label={'Office Staff'} value={'office staff'} key={5}/>
             </Picker>
             </View>
 
@@ -207,6 +211,7 @@ export default class Splash extends React.Component {
             </View>
             <View style={styles.iconInputContainer}>
             <Picker
+                mode="dropdown"
                 style = {styles.iconInputField}
                 selectedValue={this.state.emptype}
                 enabled={true}
@@ -217,6 +222,7 @@ export default class Splash extends React.Component {
                <Picker.Item label={'Part Time'} value={'grader'} key={2}/>
             </Picker>
             </View>
+
 
             <View style={{marginHorizontal:20,marginTop:15}}>
                 <Text style={{fontSize:18}}>Employment Role</Text>
@@ -321,10 +327,9 @@ export default class Splash extends React.Component {
             <TouchableOpacity onPress={this.onPostJobClick}  style={styles.loginButtonContainer}>
                 <Text style={styles.loginButtonText}>Post Job</Text>
             </TouchableOpacity>
+            </ImageBackground> 
+            </KeyboardAwareScrollView>
 
-            </ScrollView>
-        </View>
-        </ImageBackground> 
         </View>
       );
     }
@@ -332,7 +337,7 @@ export default class Splash extends React.Component {
 
 const styles = StyleSheet.create({
     maincontainer:{
-        flex:100 ,
+        flex:1 ,
         backgroundColor:"#fff" 
     },
     item: {
@@ -389,7 +394,7 @@ const styles = StyleSheet.create({
     iconInputField:{
         marginLeft:5,
         flex:1,
-        color:"#000"
+        color:"#000",
     },
     iconInputImage:{
         marginRight:20
@@ -404,7 +409,8 @@ const styles = StyleSheet.create({
         width:Dimensions.get('window').width-40,
         borderRadius:7,
         justifyContent:'center',
-        alignItems:'center'
+        alignItems:'center',
+        marginBottom:100
     },
     loginButtonText:{
         color:'white',

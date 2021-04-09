@@ -6,7 +6,8 @@ import {
     ImageBackground,
     Image,
     Dimensions, 
-    TouchableOpacity
+    TouchableOpacity,
+    StatusBar
   } from 'react-native';
 
 
@@ -52,6 +53,10 @@ export default class Splash extends React.Component {
     render () {
       return (
         <View style={styles.maincontainer}>
+        <StatusBar
+           backgroundColor = "#4F45F0"
+           barStyle = "light-content"
+         />
         <ImageBackground source={require('../../assets/image/splash_bg.png')} style={styles.backgroundImage} resizeMode='stretch' >
         <View style={styles.subcontainer1}>
             <Text style={styles.pageheader}>Welcome To DI'mand Jobs</Text>
@@ -66,8 +71,8 @@ export default class Splash extends React.Component {
             <View style={{marginLeft:'10%',marginRight:'10%',marginTop:15}}>
                 <TouchableOpacity onPress={this.onSeekerClick} style={{backgroundColor:this.state.selectedButtonIndex == 1 ? '#4F45F0' : '#4F45F01a',borderRadius:15}}>
                     <View style={{flexDirection:'row',alignItems:'center'}}>
-                    <Icon2 style={{margin:10,marginLeft:20}} name="briefcase-search" color={this.state.selectedButtonIndex == 1 ? '#fff' : '#4F45F0'} size={30} />
-                    <Text style={{color:this.state.selectedButtonIndex == 1 ? 'white' : 'black',marginLeft:10,padding:20,fontSize:18}}>Job Seeker</Text>
+                    <Icon2 style={{margin:10,marginLeft:20}} name="briefcase-search" color={this.state.selectedButtonIndex == 1 ? '#fff' : '#4F45F0'} size={28} />
+                    <Text style={{color:this.state.selectedButtonIndex == 1 ? 'white' : 'black',marginLeft:10,padding:20,fontSize:17}}>Job Seeker</Text>
                     </View>  
                 </TouchableOpacity>
             </View>
@@ -75,8 +80,8 @@ export default class Splash extends React.Component {
             <View style={{marginLeft:'10%',marginRight:'10%',marginTop:15}}>
                 <TouchableOpacity onPress={this.onProviderClick} style={{backgroundColor:this.state.selectedButtonIndex == 2 ? '#4F45F0' : '#4F45F01a',borderRadius:15}}>
                     <View style={{flexDirection:'row',alignItems:'center'}}>
-                    <Icon3 style={{margin:10,marginLeft:20}} name="diamond" color={this.state.selectedButtonIndex == 2 ? '#fff' : '#4F45F0'} size={30} />
-                    <Text style={{color:this.state.selectedButtonIndex == 2 ? 'white' : 'black',marginLeft:10,padding:20,fontSize:18}}>Job Provider</Text>
+                    <Icon3 style={{margin:10,marginLeft:20}} name="diamond" color={this.state.selectedButtonIndex == 2 ? '#fff' : '#4F45F0'} size={28} />
+                    <Text style={{color:this.state.selectedButtonIndex == 2 ? 'white' : 'black',marginLeft:10,padding:20,fontSize:17}}>Job Provider</Text>
                     </View>  
                 </TouchableOpacity>
             </View>
@@ -84,8 +89,8 @@ export default class Splash extends React.Component {
             <View style={{marginLeft:'10%',marginRight:'10%',marginTop:15}}>
                 <TouchableOpacity  onPress={this.onSellerClick} style={{backgroundColor:this.state.selectedButtonIndex == 3 ? '#4F45F0' : '#4F45F01a',borderRadius:15}}>
                     <View style={{flexDirection:'row',alignItems:'center'}}>
-                    <Icon4 style={{margin:10,marginLeft:20}} name="store" color={this.state.selectedButtonIndex == 3 ? '#fff' : '#4F45F0'} size={30} />
-                    <Text style={{color:this.state.selectedButtonIndex == 3 ? 'white' : 'black',marginLeft:10,padding:20,fontSize:18}}>Job Seller</Text>
+                    <Icon4 style={{margin:10,marginLeft:20}} name="store" color={this.state.selectedButtonIndex == 3 ? '#fff' : '#4F45F0'} size={28} />
+                    <Text style={{color:this.state.selectedButtonIndex == 3 ? 'white' : 'black',marginLeft:10,padding:20,fontSize:17}}>Job Seller</Text>
                     </View>  
                 </TouchableOpacity>
             </View>
@@ -119,10 +124,10 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     pageheader:{
-        fontSize:28
+        fontSize:26
     },
     pagesubheader:{
         marginTop:8,
-        fontSize:18
+        fontSize:17
     }
 })

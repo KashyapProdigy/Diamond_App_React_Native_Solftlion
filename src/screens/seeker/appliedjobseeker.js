@@ -8,7 +8,8 @@ import {
     Image,
     FlatList,
     Dimensions, 
-    TouchableOpacity
+    TouchableOpacity,
+    StatusBar
   } from 'react-native';
 
   import Icon1 from 'react-native-vector-icons/Entypo';
@@ -150,6 +151,10 @@ export default class Splash extends React.Component {
     render () {
       return (
         <View style={styles.maincontainer}>
+        <StatusBar
+           backgroundColor = "#4F45F0"
+           barStyle = "light-content"
+         />
         <ImageBackground source={require('../../assets/image/splash_bg.png')} style={styles.backgroundImage} resizeMode='stretch' >
         <View style={{backgroundColor : '#4F45F0' , flex:8}}>
 
@@ -187,8 +192,8 @@ export default class Splash extends React.Component {
                         
                         <View style={{borderRadius:15,borderWidth:0.5,marginTop:10,backgroundColor:'#0000000a'}}>
                             <View style={{flexDirection:'row'}}>
-                                <View style={{marginVertical:10,marginLeft:20}}><Icon4 name="user" color={'#4F45F0'} size={60} /></View>
-                                <View style={{marginVertical:15,marginLeft:30,width:'60%'}}> 
+                                <View style={{marginVertical:10,marginLeft:20}}><Icon4 name="user" color={'#4F45F0'} size={50} /></View>
+                                <View style={{marginVertical:10,marginLeft:30,width:'60%'}}> 
                                     <Text style={{fontSize:18,fontWeight:'bold'}}>{item.title}</Text>
                                     <Text style={{marginTop:6}}>{item.company}</Text>
                                 </View >
@@ -200,7 +205,7 @@ export default class Splash extends React.Component {
                                 <Text style={{marginLeft:5}}>Applied on {item.date}</Text>
                             </View>
 
-                            <View style={{padding:15,backgroundColor:'#9af5a56a',alignItems:'center',borderRadius:10,marginRight:10}}>
+                            <View style={{padding:13,backgroundColor:'#9af5a56a',alignItems:'center',borderRadius:10,marginRight:10}}>
                                 <Text style={{color:'#15d12c',fontWeight:"900"}}>{item.status}</Text>
                             </View>    
                             </View>

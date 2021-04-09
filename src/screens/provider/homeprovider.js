@@ -9,7 +9,8 @@ import {
     FlatList,
     Dimensions, 
     TouchableOpacity,
-    KeyboardAvoidingView 
+    KeyboardAvoidingView,
+    StatusBar
   } from 'react-native';
 
   import { Header } from '@react-navigation/stack';
@@ -77,6 +78,10 @@ export default class Splash extends React.Component {
       return (
 
         <View style={styles.maincontainer}>
+        <StatusBar
+           backgroundColor = "#4F45F0"
+           barStyle = "light-content"
+         />
         <ImageBackground source={require('../../assets/image/splash_bg.png')} style={styles.backgroundImage} resizeMode='stretch' >
         <View  style={{backgroundColor : '#4F45F0' , flex:8}} >
 
@@ -97,10 +102,10 @@ export default class Splash extends React.Component {
                 <Text style={{color:'#4F45F0',fontSize:22}}>Welcome, User</Text>
         </View>
 
-        <View style={{flexDirection:'row',marginTop:35,marginHorizontal:20,justifyContent:'space-between'}}>
+        <View style={{flexDirection:'row',marginTop:35,marginHorizontal:13,justifyContent:'space-between'}}>
             <TouchableOpacity  onPress={this.onActivePostClick} style={{borderRadius:15,backgroundColor:'#4F45F01a'}}>
                 <View style={{}}>
-                <Icon6 name="md-documents-outline" color={'#4F45F08a'} size={90}  style={{paddingVertical:10,paddingLeft:10}}/>
+                <Icon6 name="md-documents-outline" color={'#4F45F08a'} size={85}  style={{paddingVertical:10,paddingLeft:10}}/>
                 </View>
                 <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:10}}>
                 <View style={{marginHorizontal:17}}><Text style={{color:'#4F45F0',fontSize:15}}>Active Post</Text></View>
@@ -110,7 +115,7 @@ export default class Splash extends React.Component {
 
             <TouchableOpacity  onPress={this.onAppliedUserClick} style={{borderRadius:15,backgroundColor:'#4F45F01a'}}>
                 <View style={{}}>
-                <Icon4 name="user" color={'#4F45F08a'} size={90}  style={{paddingVertical:10,paddingLeft:15}}/>
+                <Icon4 name="user" color={'#4F45F08a'} size={85}  style={{paddingVertical:10,paddingLeft:15}}/>
                 </View>
                 <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:10}}>
                 <View style={{marginHorizontal:17}}><Text style={{color:'#4F45F0',fontSize:15}}>Today's{`\n`}Applied User</Text></View>
@@ -119,9 +124,9 @@ export default class Splash extends React.Component {
             </TouchableOpacity>
         </View>
         
-        <TouchableOpacity  onPress={this.onTotalPostClick} style={{borderRadius:15,backgroundColor:'#4F45F01a',marginHorizontal:20,marginTop:30}}>
+        <TouchableOpacity  onPress={this.onTotalPostClick} style={{borderRadius:15,backgroundColor:'#4F45F01a',marginHorizontal:13,marginTop:30}}>
                 <View style={{}}>
-                <Icon2 name="text-box-check-outline" color={'#4F45F08a'} size={90}  style={{paddingVertical:10,paddingLeft:8}}/>
+                <Icon2 name="text-box-check-outline" color={'#4F45F08a'} size={85}  style={{paddingVertical:10,paddingLeft:8}}/>
                 </View>
                 <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:10}}>
                 <View style={{marginHorizontal:17}}><Text style={{color:'#4F45F0',fontSize:15}}>Total Post</Text></View>
@@ -158,6 +163,7 @@ export default class Splash extends React.Component {
 
 const styles = StyleSheet.create({
     maincontainer:{
+        
         flex:100 ,
         backgroundColor:"#fff" ,
     },
@@ -173,6 +179,7 @@ const styles = StyleSheet.create({
     subcontainer1:{
         height:Dimensions.get('window').height/100*20,
         justifyContent:'center',
+        width:Dimensions.get('window').width,
         marginLeft:'15%'
     },
     subcontainer2:{

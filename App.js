@@ -9,6 +9,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { AppearanceProvider } from 'react-native-appearance';
 
 /**
  * Common Screen Imports For Root Stack

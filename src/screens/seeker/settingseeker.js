@@ -8,7 +8,8 @@ import {
     Image,
     FlatList,
     Dimensions, 
-    TouchableOpacity
+    TouchableOpacity,
+    StatusBar
   } from 'react-native';
 
   import Icon1 from 'react-native-vector-icons/Entypo';
@@ -71,13 +72,17 @@ export default class Splash extends React.Component {
     render () {
       return (
         <View style={styles.maincontainer}>
+        <StatusBar
+           backgroundColor = "#4F45F0"
+           barStyle = "light-content"
+         />
         <ImageBackground source={require('../../assets/image/splash_bg.png')} style={styles.backgroundImage} resizeMode='stretch' >
         <View style={{backgroundColor : '#4F45F0' , flex:8}}>
 
             <TouchableOpacity onPress={this.onBackButtonClick}
-            style={{marginTop:20,marginLeft:20,flexDirection:'row',alignItems:'center'}}>
-                <Icon5 name="left" color={'white'} size={26} />
-                <Text style={{color:'white',fontSize:22,marginLeft:4}}>Setting</Text>
+            style={{marginTop:17,marginLeft:20,flexDirection:'row',alignItems:'center'}}>
+                <Icon5 name="left" color={'white'} size={26} style={{textAlignVertical:'center'}} />
+                <Text style={{color:'white',fontSize:22,marginLeft:4,textAlignVertical:'center'}}>Setting</Text>
             </TouchableOpacity>
 
         </View>
@@ -87,30 +92,30 @@ export default class Splash extends React.Component {
         <View style={{margin:20,borderRadius:15 , backgroundColor:'#4F45F01a'}}>
 
         <TouchableOpacity onPress={this.onAboutUsClick}>
-                <Text style={{color:'#000',fontSize:22,marginHorizontal:20,borderBottomWidth:0.8,paddingVertical:10}}>About Us</Text>
+                <Text style={{color:'#000',fontSize:20,marginHorizontal:20,borderBottomWidth:0.8,paddingVertical:10}}>About Us</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={this.onContactUsClick}>
-                <Text style={{color:'#000',fontSize:22,marginHorizontal:20,borderBottomWidth:0.8,paddingVertical:10}}>Contact Us</Text>
+                <Text style={{color:'#000',fontSize:20,marginHorizontal:20,borderBottomWidth:0.8,paddingVertical:10}}>Contact Us</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={this.onPrivacyPolicyClick}>
-                <Text style={{color:'#000',fontSize:22,marginHorizontal:20,borderBottomWidth:0.8,paddingVertical:10}}>Privacy Policy</Text>
+                <Text style={{color:'#000',fontSize:20,marginHorizontal:20,borderBottomWidth:0.8,paddingVertical:10}}>Privacy Policy</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={this.onTermsConditionClick}>
-                <Text style={{color:'#000',fontSize:22,marginHorizontal:20,borderBottomWidth:0.8,paddingVertical:10}}>Terms and Condition</Text>
+                <Text style={{color:'#000',fontSize:20,marginHorizontal:20,borderBottomWidth:0.8,paddingVertical:10}}>Terms and Condition</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={this.onRateAppClick}>
-                <Text style={{color:'#000',fontSize:22,marginHorizontal:20,paddingVertical:10}}>Rate App</Text>
+                <Text style={{color:'#000',fontSize:20,marginHorizontal:20,paddingVertical:10}}>Rate App</Text>
         </TouchableOpacity>
 
         </View>
 
         <View style={{margin:20,borderRadius:15 , backgroundColor:'#4F45F01a'}}>
         <TouchableOpacity onPress={this.onLogoutCLick}>
-                <Text style={{color:'#000',fontSize:22,alignSelf:'center',marginHorizontal:20,paddingVertical:10}}>Logout</Text>
+                <Text style={{color:'#000',fontSize:20,alignSelf:'center',marginHorizontal:20,paddingVertical:10}}>Logout</Text>
         </TouchableOpacity>
         </View>
 

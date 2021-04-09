@@ -7,7 +7,8 @@ import {
     ImageBackground,
     Image,
     Dimensions, 
-    TouchableOpacity
+    TouchableOpacity,
+    StatusBar
   } from 'react-native';
 
 
@@ -53,6 +54,10 @@ export default class Splash extends React.Component {
     render () {
       return (
         <View style={styles.maincontainer}>
+        <StatusBar
+           backgroundColor = "#4F45F0"
+           barStyle = "light-content"
+         />
         <ImageBackground source={require('../../assets/image/splash_bg.png')} style={styles.backgroundImage} resizeMode='stretch' >
         <View style={styles.subcontainer1}>
             <Text style={styles.pageheader}>Login</Text>
@@ -90,7 +95,7 @@ export default class Splash extends React.Component {
                 <Text style={styles.loginButtonText}>Login</Text>
             </TouchableOpacity>
 
-            <Text style={{fontSize:20,color:'#000',alignSelf:'center',marginTop:20}}>Or Continue With</Text>
+            <Text style={{fontSize:18,color:'#000',alignSelf:'center',marginTop:20}}>Or Continue With</Text>
 
             <View style={{flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
                 <TouchableOpacity onPress={this.onFacebookClick}style={styles.socialButtonContainer}>
@@ -105,9 +110,9 @@ export default class Splash extends React.Component {
             </View>
 
             <View style={{flexDirection:'row',marginTop:35}}>
-            <Text style={{fontSize:20,color:'#000',alignSelf:'center'}}>Don't have an account?</Text>
+            <Text style={{fontSize:18,color:'#000',alignSelf:'center'}}>Don't have an account?</Text>
             <TouchableOpacity onPress={this.onRegisterClick}>
-                <Text style={{fontSize:20,color:'#4F45F0',alignSelf:'center'}}>  REGISTER</Text>
+                <Text style={{fontSize:18,color:'#4F45F0',alignSelf:'center'}}>  REGISTER</Text>
             </TouchableOpacity>
             </View>
 
@@ -143,7 +148,7 @@ const styles = StyleSheet.create({
         color:'#4F45F0'
     },
     forgotPasswordText:{
-        fontSize:22,
+        fontSize:18,
         color:'#4F45F0',
     },
     forgotPasswordContainer:{
@@ -189,7 +194,7 @@ const styles = StyleSheet.create({
     },
     loginButtonText:{
         color:'white',
-        fontSize:25
+        fontSize:22
     },
     socialButtonContainer:{
         flexDirection:'row',

@@ -9,7 +9,8 @@ import {
     FlatList,
     Dimensions, 
     TouchableOpacity,
-    ScrollView
+    ScrollView,
+    StatusBar
   } from 'react-native';
 
   import Icon1 from 'react-native-vector-icons/Entypo';
@@ -94,6 +95,10 @@ export default class Splash extends React.Component {
     render () {
       return (
         <View style={styles.maincontainer}>
+        <StatusBar
+           backgroundColor = "#4F45F0"
+           barStyle = "light-content"
+         />
         <ImageBackground source={require('../../assets/image/splash_bg.png')} style={styles.backgroundImage} resizeMode='stretch' >
         <View style={{backgroundColor : '#4F45F0' , flex:8}}>
 

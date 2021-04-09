@@ -7,7 +7,8 @@ import {
     ImageBackground,
     Image,
     Dimensions, 
-    TouchableOpacity
+    TouchableOpacity,
+    StatusBar
   } from 'react-native';
 
   import Icon1 from 'react-native-vector-icons/Entypo';
@@ -18,6 +19,9 @@ import {
   import Icon6 from 'react-native-vector-icons/Ionicons';
   import Icon7 from 'react-native-vector-icons/EvilIcons';
   import Icon8 from 'react-native-vector-icons/Fontisto';
+
+  import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+
 
 export default class Splash extends React.Component {
     constructor (props) {
@@ -42,9 +46,12 @@ export default class Splash extends React.Component {
 
     render () {
       return (
-        <View style={styles.maincontainer}>
+        <KeyboardAwareScrollView style={styles.maincontainer} extraHeight={100} enableOnAndroid>
+        <StatusBar
+           backgroundColor = "#4F45F0"
+           barStyle = "light-content"
+         />
         <ImageBackground source={require('../../assets/image/splash_bg.png')} style={styles.backgroundImage} resizeMode='stretch' >
-        <View style={styles.subcontainer1}>
             <Text style={{marginTop:30,marginLeft:50,fontSize:28,color:'#000'}}>Apply Now</Text>
 
             <View style={{borderRadius:15,borderWidth:0.7,marginHorizontal:50,marginTop:15,paddingBottom:10,backgroundColor:'#fff'}}>
@@ -99,7 +106,7 @@ export default class Splash extends React.Component {
 
             </View>
 
-            <Text style={{marginTop:30,marginLeft:50,fontSize:28,color:'#000'}}>Previous Job Info</Text>
+            <Text style={{marginTop:70,marginLeft:50,fontSize:28,color:'#000'}}>Previous Job Info</Text>
 
             <View style={{borderRadius:15,borderWidth:0.7,marginHorizontal:50,marginTop:15,paddingBottom:10,backgroundColor:'#fff'}}>
 
@@ -152,11 +159,9 @@ export default class Splash extends React.Component {
             <TouchableOpacity onPress={this.onSubmitClick}  style={styles.loginButtonContainer}>
                 <Text style={styles.loginButtonText}>Submit</Text>
             </TouchableOpacity>
-
-        </View>
         
         </ImageBackground> 
-        </View>
+        </KeyboardAwareScrollView>
       );
     }
 }
@@ -177,6 +182,7 @@ const styles = StyleSheet.create({
 
     backgroundImage: {
         flex: 1,
+        paddingBottom:120
     },
     pageheader:{
         fontSize:28,
@@ -218,13 +224,14 @@ const styles = StyleSheet.create({
         alignItems:'center',
         backgroundColor:'#fff',
         marginHorizontal:'10%',
-        marginTop:30,
+        marginTop:60,
         height:55,
         width:Dimensions.get('window').width-180,
         borderRadius:30,
         justifyContent:'center',
         alignSelf:'center',
-        borderWidth:0.7
+        borderWidth:0.7,
+        marginBottom:50
     },
     loginButtonText:{
         color:'#4F45F0',

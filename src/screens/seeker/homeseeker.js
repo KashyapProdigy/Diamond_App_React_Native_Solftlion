@@ -9,10 +9,11 @@ import {
     FlatList,
     Dimensions, 
     TouchableOpacity,
-    KeyboardAvoidingView 
+    KeyboardAvoidingView ,
+    StatusBar
   } from 'react-native';
 
-  import { Header } from '@react-navigation/stack';
+  import DropdownAlert from 'react-native-dropdownalert';
 
   import Icon1 from 'react-native-vector-icons/Entypo';
   import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -112,6 +113,7 @@ export default class Splash extends React.Component {
                 value: "demo"
             }
         ],
+          searchstring:'',
           togglePasswordVisibility:true,
           loading:false,
       };
@@ -147,7 +149,11 @@ export default class Splash extends React.Component {
     }
 
     onSaveJobClick(){
-        this.props.navigation.navigate('HomeSeeker');
+        this.dropDownAlertRef.alertWithType('success', 'Saved !', "Job Saved Succcessfully !",null,1500)
+
+        setTimeout(() => {
+            this.props.navigation.navigate('SavedJobSeeker')
+            }, 2500);
     }
  
   renderItem = ({ item }) => (
@@ -158,10 +164,14 @@ export default class Splash extends React.Component {
 
     render () {
       return (
-        <KeyboardAvoidingView style={{flex:100}} enabled={true}>
-            <View style={styles.maincontainer}>
+        <View style={styles.maincontainer}>
+        <StatusBar
+           backgroundColor = "#4F45F0"
+           barStyle = "light-content"
+         />
+        <DropdownAlert inactiveStatusBarStyle="light-content" inactiveStatusBarBackgroundColor="#4F45F0" ref={ref => this.dropDownAlertRef = ref} />
         <ImageBackground source={require('../../assets/image/splash_bg.png')} style={styles.backgroundImage} resizeMode='stretch' >
-        <View   keyboardVerticalOffset = {Header.HEIGHT} style={{backgroundColor : '#4F45F0' , flex:25}} behavior="padding">
+        <View style={{backgroundColor : '#4F45F0' , flex:25}} >
 
             <View style={{alignSelf:'flex-end',flexDirection:'row',marginHorizontal:10,marginTop:20}}>
                 <TouchableOpacity  onPress={this.onFilterClick} style={{marginHorizontal:10}}>
@@ -185,7 +195,7 @@ export default class Splash extends React.Component {
                 placeholder = "What are you looking for ? "
                 placeholderTextColor = "#0000003a"
                 autoCapitalize = "none"
-                onChangeText={(email) => this.setState({email})}  />
+                onChangeText={(value) => this.setState({searchstring:value})}  />
                <Icon3 name="search" color={'#4F45F0'} size={26}  style={styles.iconInputImage}/>
             </View>
 
@@ -193,11 +203,11 @@ export default class Splash extends React.Component {
         
         <View style={{ flex:75 ,}}>
 
-        <View style={{marginTop:10,marginLeft:20}}>
+        <View style={{marginTop:8,marginHorizontal:20}}>
                 <Text style={{color:'#000',fontSize:18}}>Search by category</Text>
         </View>
 
-        <View style={{marginTop:10,marginBottom:10}}>
+        <View style={{marginTop:10,marginBottom:8}}>
             <FlatList
             horizontal={true}
             showsVerticalScrollIndicator={false}
@@ -208,24 +218,24 @@ export default class Splash extends React.Component {
             />
         </View>
 
-        <View style={{marginTop:10,marginLeft:20}}>
+        <View style={{marginTop:8,marginHorizontal:20}}>
                 <Text style={{color:'#000',fontSize:18}}>Recommended Jobs</Text>
         </View>
 
 
-        <View style={{margin:20}}>
+        <View style={{marginHorizontal:20,marginTop:5}}>
                 <FlatList
                     showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ paddingBottom: 170 }}
+                    contentContainerStyle={{ paddingBottom: 170,paddingTop:10 }}
                     data={this.state.renderjobs}
                     keyExtractor={item => item.id}
                     renderItem={({ item }) => 
                         
                         <View style={{borderRadius:15,borderWidth:0.5,marginTop:10,backgroundColor:'#0000000a'}}>
                             <View style={{flexDirection:'row'}}>
-                                <View style={{marginVertical:10,marginLeft:20}}><Icon4 name="user" color={'#4F45F0'} size={60} /></View>
+                                <View style={{marginVertical:10,marginLeft:20}}><Icon4 name="user" color={'#4F45F0'} size={45} /></View>
                                 <View style={{marginVertical:10,marginLeft:30,width:'60%'}}> 
-                                    <Text style={{fontSize:18,fontWeight:'bold'}}>{item.title}</Text>
+                                    <Text style={{fontSize:16,fontWeight:'bold'}}>{item.title}</Text>
                                     <Text style={{marginTop:6}}>{item.company}</Text>
                                 </View >
                                 <TouchableOpacity onPress={this.onSaveJobClick} style={{paddingVertical:10,paddingHorizontal:10}}><Icon3 name="bookmark" color={'#4F45F0'} size={28} /></TouchableOpacity>
@@ -252,10 +262,10 @@ export default class Splash extends React.Component {
                             </View>
 
                             <View style={{flexDirection:'row',marginLeft:20,marginTop:25,marginBottom:15,alignItems:'center',justifyContent:'space-between'}}>
-                                <View style={{padding:15,backgroundColor:'#9af5a56a',alignItems:'center',borderRadius:10}}><Text style={{marginLeft:5,color:'#15d12c',fontWeight:"900"}}>{item.status}</Text></View>
+                                <View style={{padding:10,backgroundColor:'#9af5a56a',alignItems:'center',borderRadius:10}}><Text style={{marginLeft:5,color:'#15d12c',fontWeight:"900"}}>{item.status}</Text></View>
                                 <TouchableOpacity onPress={this.onApplyNowClick} style={{flexDirection:'row',alignItems:'center',marginRight:20}}>
-                                    <Text style={{color:'#4F45F0',fontSize:18}}>Apply Now</Text>
-                                    <Icon5 style={{top:2}} name="arrowright" color={'#4F45F0'} size={30} />
+                                    <Text style={{color:'#4F45F0',fontSize:16}}>Apply Now</Text>
+                                    <Icon5 style={{top:2}} name="arrowright" color={'#4F45F0'} size={28} />
                                 </TouchableOpacity> 
                             </View>
                         </View>
@@ -266,7 +276,6 @@ export default class Splash extends React.Component {
         </View>
         </ImageBackground> 
         </View>
-        </KeyboardAvoidingView>
       );
     }
 }
@@ -279,11 +288,11 @@ const styles = StyleSheet.create({
     item: {
         backgroundColor: '#4F45F02a',
         borderRadius:15,
-        padding:15,
+        padding:10,
         marginHorizontal:10
       },
       title: {
-        fontSize: 18,
+        fontSize: 15,
       },
     subcontainer1:{
         height:Dimensions.get('window').height/100*20,

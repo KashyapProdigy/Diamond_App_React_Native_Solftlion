@@ -7,7 +7,8 @@ import {
     ImageBackground,
     Image,
     Dimensions, 
-    TouchableOpacity
+    TouchableOpacity,
+    StatusBar
   } from 'react-native';
 
 
@@ -52,6 +53,10 @@ export default class Splash extends React.Component {
     render () {
       return (
         <View style={styles.maincontainer}>
+        <StatusBar
+           backgroundColor = "#4F45F0"
+           barStyle = "light-content"
+         />
         <ImageBackground source={require('../../assets/image/splash_bg.png')} style={styles.backgroundImage} resizeMode='stretch' >
         <View style={styles.subcontainer1}>
             <Text style={styles.pageheader}>Register</Text>
@@ -117,7 +122,7 @@ export default class Splash extends React.Component {
                 <Text style={styles.loginButtonText}>Register</Text>
             </TouchableOpacity>
 
-            <Text style={{fontSize:20,color:'#000',alignSelf:'center',marginTop:20}}>Or Continue With</Text>
+            <Text style={{fontSize:18,color:'#000',alignSelf:'center',marginTop:20}}>Or Continue With</Text>
 
             <View style={{flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
                 <TouchableOpacity onPress={this.onFacebookClick}style={styles.socialButtonContainer}>
@@ -131,12 +136,12 @@ export default class Splash extends React.Component {
                 </TouchableOpacity>
             </View>
 
-            <Text style={{marginTop:15,fontSize:20,color:'#000',alignSelf:'center'}}>by continuing you confirm that you agree</Text>
-            <Text style={{marginTop:2,fontSize:20,color:'#000',alignSelf:'center'}}>with our Terms and Condition</Text>
+            <Text style={{marginTop:15,fontSize:17,color:'#000',alignSelf:'center'}}>by continuing you confirm that you agree</Text>
+            <Text style={{marginTop:2,fontSize:17,color:'#000',alignSelf:'center'}}>with our Terms and Condition</Text>
             <View style={{flexDirection:'row',marginTop:25}}>
-            <Text style={{fontSize:20,color:'#000',alignSelf:'center'}}>Already have an account?</Text>
+            <Text style={{fontSize:17,color:'#000',alignSelf:'center'}}>Already have an account?</Text>
             <TouchableOpacity onPress={this.onLoginClick}>
-                <Text style={{fontSize:20,color:'#4F45F0',alignSelf:'center'}}>  LOGIN</Text>
+                <Text style={{fontSize:17,color:'#4F45F0',alignSelf:'center'}}>  LOGIN</Text>
             </TouchableOpacity>
             </View>
 
@@ -154,7 +159,7 @@ const styles = StyleSheet.create({
         backgroundColor:"#fff" 
     },
     subcontainer1:{
-        height:Dimensions.get('window').height/100*20,
+        height:Dimensions.get('window').height/100*15,
         justifyContent:'center',
         marginLeft:'15%'
     },
