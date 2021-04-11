@@ -47,7 +47,7 @@ export default class Splash extends React.Component {
 
     onSellerClick(){
         this.setState({selectedButtonIndex:3})
-        this.props.navigation.navigate('LandingPage');
+        this.props.navigation.navigate('LoginSeller');
     }
 
     render () {

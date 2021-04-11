@@ -21,6 +21,11 @@ import {
   import Icon6 from 'react-native-vector-icons/Ionicons';
   import Icon7 from 'react-native-vector-icons/EvilIcons';
 
+  import Modal from 'react-native-modal';
+  import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+  import DropdownAlert from 'react-native-dropdownalert';
+
+
 export default class Splash extends React.Component {
     constructor (props) {
       super(props);
@@ -39,14 +44,16 @@ export default class Splash extends React.Component {
           ctotalexperience:'',
           cstartdate:'',
           cenddate:'',
-          togglePasswordVisibility:true,
+          companyArray:[],
+          CompanyModalVisible: false,
+          editting:false,
           loading:false,
       };
 
       this.onNotificationClick = this.onNotificationClick.bind(this);
       this.onSettingClick = this.onSettingClick.bind(this);
       this.onUpdateProfileClick = this.onUpdateProfileClick.bind(this);
-      this.onCompanyAddClick = this.onCompanyAddClick.bind(this);
+      this.onCompanyModalSubmitClick = this.onCompanyModalSubmitClick.bind(this);
       this.onCompanyEditClick = this.onCompanyEditClick.bind(this);
       this.onCompanySubmitClick = this.onCompanySubmitClick.bind(this);
     }
@@ -63,7 +70,11 @@ export default class Splash extends React.Component {
     }
 
     onUpdateProfileClick(){
-        this.props.navigation.navigate('ProfileSeeker');
+        this.dropDownAlertRef.alertWithType('success', 'Update Successfull', "User Profile Updated !",null,1500)
+
+        setTimeout(() => {
+            this.props.navigation.navigate('ProfileSeeker')
+            }, 2500);    
     }
 
     onProfilePictureClick = () => {
@@ -91,17 +102,74 @@ export default class Splash extends React.Component {
         });
     }
 
+    CompanyModal = () => {
+        this.setState({
+            CompanyModalVisible: !this.state.CompanyModalVisible,            
+            cname:'',
+            cjobexperience:'',
+            cjobtitle:'',
+            clastjobexperience:'',
+            cstartdate:'',
+            cenddate:'',
+            ctotalexperience:'',
+            editting:false
+        });
+      };
 
-    onCompanyAddClick(){
-        this.props.navigation.navigate('ProfileSeeker');
+    onCompanyModalSubmitClick(editable){
+        if(editable){
+            let CompanyName = this.state.cname;
+            let CompanyWorkExperience = this.state.cjobexperience;
+            let LastJobTitle = this.state.cjobtitle;
+            let LastJobExperience = this.state.clastjobexperience;
+            let LastJobStartDate = this.state.cstartdate;
+            let LastJobEndDate = this.state.cenddate;
+            let TotalExperience = this.state.ctotalexperience;
+    
+    
+            let obj ={CompanyName,CompanyWorkExperience,LastJobTitle,LastJobExperience,LastJobStartDate,LastJobEndDate,TotalExperience}
+            let finalArray = this.state.companyArray;
+            finalArray[this.state.editIndex] = obj;
+            this.setState({companyArray:finalArray,CompanyModalVisible:false,editIndex:null,editting:false})
+
+        }else{
+            let CompanyName = this.state.cname;
+            let CompanyWorkExperience = this.state.cjobexperience;
+            let LastJobTitle = this.state.cjobtitle;
+            let LastJobExperience = this.state.clastjobexperience;
+            let LastJobStartDate = this.state.cstartdate;
+            let LastJobEndDate = this.state.cenddate;
+            let TotalExperience = this.state.ctotalexperience;
+    
+    
+            let obj ={CompanyName,CompanyWorkExperience,LastJobTitle,LastJobExperience,LastJobStartDate,LastJobEndDate,TotalExperience}
+            let finalArray = this.state.companyArray;
+            finalArray.push(obj);
+            this.setState({companyArray:finalArray,CompanyModalVisible:false,editIndex:null,editting:false})
+        }
     }
 
-    onCompanyEditClick(){
-        this.props.navigation.navigate('ProfileSeeker');
+    onCompanyEditClick(item,index){
+        this.setState({
+            cname:item.CompanyName,
+            cjobexperience:item.CompanyWorkExperience,
+            cjobtitle:item.LastJobTitle,
+            clastjobexperience:item.LastJobExperience,
+            cstartdate:item.LastJobStartDate,
+            cenddate:item.LastJobEndDate,
+            ctotalexperience:item.TotalExperience,
+            editting:true,
+            editIndex:index,
+            CompanyModalVisible:true
+        })
     }
 
     onCompanySubmitClick(){
-        this.props.navigation.navigate('ProfileSeeker');
+        this.dropDownAlertRef.alertWithType('success', 'Save Successfull', "Company Profile Saved !",null,1500)
+
+        setTimeout(() => {
+            this.props.navigation.navigate('ProfileSeeker')
+            }, 2500);
     }
 
     render () {
@@ -298,139 +366,179 @@ export default class Splash extends React.Component {
 
             <View style={{marginHorizontal:20,marginTop:15,justifyContent:'space-between',flexDirection:'row'}}>
                 <Text style={{color:"#fff",alignSelf:'flex-start',backgroundColor:"#4F45F0",padding:5,borderRadius:5,fontSize:18}}>Company Details</Text>
-                <TouchableOpacity onPress={this.onCompanyAddClick}  style={{padding:5,alignItems:'center',justifyContent:'center',backgroundColor:'#4F45F0',borderRadius:10}}><Icon6 name="add" color={'white'} size={24} /></TouchableOpacity>
+                <TouchableOpacity onPress={this.CompanyModal}  style={{padding:5,alignItems:'center',justifyContent:'center',backgroundColor:'#4F45F0',borderRadius:10}}><Icon6 name="add" color={'white'} size={24} /></TouchableOpacity>
             </View>
-
-            <View style={{marginHorizontal:20,marginTop:15,padding:10,justifyContent:'space-between',alignItems:'center',flexDirection:'row',backgroundColor:'#4F45F01a',borderRadius:7}}>
-                <View>
-                    <Text>Krishna Pvt.Ltd</Text>
-                    <Text>4+ years experience</Text>
-                    <Text>15/3/2020 - 15/3/2030</Text>
+            
+        <View style={{marginHorizontal:20,marginTop:5}}>
+                <FlatList
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{ paddingBottom: 20,paddingTop:10 }}
+                    data={this.state.companyArray}
+                    keyExtractor={item => item.CompanyName}
+                    renderItem={({ item , index }) => 
+                        
+                    <View style={{marginTop:15,padding:10,justifyContent:'space-between',alignItems:'center',flexDirection:'row',backgroundColor:'#4F45F01a',borderRadius:7}}>
+                    <View>
+                        <Text>{item.CompanyName}</Text>
+                        <Text>{item.CompanyWorkExperience}</Text>
+                        <Text>{item.LastJobStartDate} - {item.LastJobEndDate}</Text>
+                    </View>
+                    <TouchableOpacity onPress={()=>{this.onCompanyEditClick(item,index)}}  style={{paddingVertical:5,paddingHorizontal:15,alignItems:'center',justifyContent:'center',backgroundColor:'#4F45F0',borderRadius:10}}><Text style={{color:'#fff'}}>Edit</Text></TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={this.onCompanyEditClick}  style={{paddingVertical:5,paddingHorizontal:15,alignItems:'center',justifyContent:'center',backgroundColor:'#4F45F0',borderRadius:10}}><Text style={{color:'#fff'}}>Edit</Text></TouchableOpacity>
-            </View>
-
-            <View style={{marginHorizontal:20,marginTop:15}}>
-                <Text style={{fontSize:18}}>Company Name</Text>
-            </View>
-            <View style={styles.iconInputContainer}>
-            <TextInput style = {styles.iconInputField}
-                underlineColorAndroid = "transparent"
-                placeholder = "Company Name"
-                placeholderTextColor = "#0000005a"
-                autoCapitalize = "none"
-                value={this.state.cname}
-                onChangeText={(cname) => this.setState({cname})}  />
-            </View>
-
-            <View style={{marginHorizontal:20,marginTop:15}}>
-                <Text style={{fontSize:18}}>Work Experience</Text>
-            </View>
-            <View style={styles.iconInputContainer}>
-            <TextInput style = {styles.iconInputField}
-                underlineColorAndroid = "transparent"
-                placeholder = "Experience"
-                placeholderTextColor = "#0000005a"
-                autoCapitalize = "none"
-                value={this.state.cjobexperience}
-                onChangeText={(cjobexperience) => this.setState({cjobexperience})}  />
-            </View>
-
-            <View style={{marginHorizontal:20,marginTop:15}}>
-                <Text style={{fontSize:18}}>Last Job Title</Text>
-            </View>
-            <View style={styles.iconInputContainer}>
-            <TextInput style = {styles.iconInputField}
-                underlineColorAndroid = "transparent"
-                placeholder = "Job Title"
-                placeholderTextColor = "#0000005a"
-                autoCapitalize = "none"
-                value={this.state.cjobtitle}
-                onChangeText={(cjobtitle) => this.setState({cjobtitle})}  />
-            </View>
-
-            <View style={{marginHorizontal:20,marginTop:15}}>
-                <Text style={{fontSize:18}}>Last Job Experience</Text>
-            </View>
-            <View style={styles.iconInputContainer}>
-            <TextInput style = {styles.iconInputField}
-                underlineColorAndroid = "transparent"
-                placeholder = "Last Job Experience"
-                placeholderTextColor = "#0000005a"
-                autoCapitalize = "none"
-                value={this.state.clastjobexperience}
-                onChangeText={(clastjobexperience) => this.setState({clastjobexperience})}  />
-            </View>
-
-            <View style={{marginHorizontal:20,marginTop:15}}>
-                <Text style={{fontSize:18}}>Last Job TimeStamps</Text>
-            </View>
-            <View style={{marginTop:4,marginHorizontal:20,flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-            <View style={{}}>
-                <Text style={{fontSize:18}}>Start Date</Text>
-                <View style={{
-                    flexDirection:'row',
-                    alignItems:'center',
-                    backgroundColor:'#4F45F01a',
-                    marginTop:5,
-                    height:45,
-                    width:Dimensions.get('window').width/2.5,
-                    borderRadius:7,
-                    }}>
-            <TextInput style = {styles.iconInputField}
-                underlineColorAndroid = "transparent"
-                placeholder = "Start Date"
-                placeholderTextColor = "#0000005a"
-                autoCapitalize = "none"
-                value={this.state.cstartdate}
-                onChangeText={(cstartdate) => this.setState({cstartdate})}  />
-            </View>
-            </View>
-
-            <View style={{}}>
-                <Text style={{fontSize:18}}>End Date</Text>
-                <View style={{
-                    flexDirection:'row',
-                    alignItems:'center',
-                    backgroundColor:'#4F45F01a',
-                    marginTop:5,
-                    height:45,
-                    width:Dimensions.get('window').width/2.5,
-                    borderRadius:7,
-                    }}>
-            <TextInput style = {styles.iconInputField}
-                underlineColorAndroid = "transparent"
-                placeholder = "End Date"
-                placeholderTextColor = "#0000005a"
-                autoCapitalize = "none"
-                value={this.state.cenddate}
-                onChangeText={(cenddate) => this.setState({cenddate})}  />
-            </View>
-            </View>
-            </View>
-
-            <View style={{marginHorizontal:20,marginTop:15}}>
-                <Text style={{fontSize:18}}>Total Experience</Text>
-            </View>
-            <View style={styles.iconInputContainer}>
-            <TextInput style = {styles.iconInputField}
-                underlineColorAndroid = "transparent"
-                placeholder = "Total Experience"
-                placeholderTextColor = "#0000005a"
-                autoCapitalize = "none"
-                value={this.state.ctotalexperience}
-                onChangeText={(ctotalexperience) => this.setState({ctotalexperience})}  />
-            </View>
-
-
-
-            <TouchableOpacity onPress={this.onCompanySubmitClick}  style={styles.loginButtonContainer}>
+                        }
+                />
+        </View>
+            
+            {
+                this.state.companyArray.length ?
+                <TouchableOpacity onPress={this.onCompanySubmitClick}  style={styles.loginButtonContainer}>
                 <Text style={styles.loginButtonText}>Submit</Text>
-            </TouchableOpacity>
+                </TouchableOpacity>
+                :
+                null
+            }
+ 
 
             </ScrollView>
         </View>
         </ImageBackground> 
+
+        <Modal isVisible={this.state.CompanyModalVisible} avoidKeyboard={false}>
+        <KeyboardAwareScrollView 
+            style={{borderWidth:1,width:"100%",height:"70%",borderRadius:15, backgroundColor:"#fff",alignSelf:"center"}} 
+            extraHeight={200} enableOnAndroid>
+
+                    <View style={{marginTop:15,alignSelf:"flex-end",marginRight:15}}>
+                                <TouchableOpacity onPress={this.CompanyModal}>
+                                <Icon5 name="closecircleo" color="#4F45F0" size={25}/>
+                                </TouchableOpacity>
+                    </View>
+                        <View style={{height:40,flexDirection:"row",marginTop:30}}>
+                            <View style={{marginTop:3,alignSelf:"center",width:"100%"}}>
+                            <Text style={{textAlign:"center",fontSize:20,color:"#4F45F0"}}>Company Profile</Text>
+                            </View>
+                        </View>
+
+                        <View style={{marginHorizontal:20,marginTop:35}}>
+                            <Text style={{fontSize:18}}>Company Name</Text>
+                        </View>
+                        <View style={styles.iconInputContainerModal}>
+                        <TextInput style = {styles.iconInputField}
+                            underlineColorAndroid = "transparent"
+                            placeholder = "Company Name"
+                            placeholderTextColor = "#0000005a"
+                            autoCapitalize = "none"
+                            value={this.state.cname}
+                            onChangeText={(cname) => this.setState({cname})}  />
+                        </View>
+
+                        <View style={{marginHorizontal:20,marginTop:25}}>
+                            <Text style={{fontSize:18}}>Work Experience</Text>
+                        </View>
+                        <View style={styles.iconInputContainerModal}>
+                        <TextInput style = {styles.iconInputField}
+                            underlineColorAndroid = "transparent"
+                            placeholder = "Experience"
+                            placeholderTextColor = "#0000005a"
+                            autoCapitalize = "none"
+                            value={this.state.cjobexperience}
+                            onChangeText={(cjobexperience) => this.setState({cjobexperience})}  />
+                        </View>
+
+                        <View style={{marginHorizontal:20,marginTop:25}}>
+                            <Text style={{fontSize:18}}>Last Job Title</Text>
+                        </View>
+                        <View style={styles.iconInputContainerModal}>
+                        <TextInput style = {styles.iconInputField}
+                            underlineColorAndroid = "transparent"
+                            placeholder = "Job Title"
+                            placeholderTextColor = "#0000005a"
+                            autoCapitalize = "none"
+                            value={this.state.cjobtitle}
+                            onChangeText={(cjobtitle) => this.setState({cjobtitle})}  />
+                        </View>
+
+                        <View style={{marginHorizontal:20,marginTop:25}}>
+                            <Text style={{fontSize:18}}>Last Job Experience</Text>
+                        </View>
+                        <View style={styles.iconInputContainerModal}>
+                        <TextInput style = {styles.iconInputField}
+                            underlineColorAndroid = "transparent"
+                            placeholder = "Last Job Experience"
+                            placeholderTextColor = "#0000005a"
+                            autoCapitalize = "none"
+                            value={this.state.clastjobexperience}
+                            onChangeText={(clastjobexperience) => this.setState({clastjobexperience})}  />
+                        </View>
+
+                        <View style={{marginHorizontal:20,marginTop:25}}>
+                            <Text style={{fontSize:18}}>Last Job TimeStamps</Text>
+                        </View>
+                        <View style={{marginTop:4,marginHorizontal:20,flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+                        <View style={{}}>
+                            <Text style={{fontSize:18}}>Start Date</Text>
+                            <View style={{
+                                flexDirection:'row',
+                                alignItems:'center',
+                                backgroundColor:'#4F45F01a',
+                                marginTop:5,
+                                height:45,
+                                width:Dimensions.get('window').width/3,
+                                borderRadius:7,
+                                }}>
+                        <TextInput style = {styles.iconInputField}
+                            underlineColorAndroid = "transparent"
+                            placeholder = "Start Date"
+                            placeholderTextColor = "#0000005a"
+                            autoCapitalize = "none"
+                            value={this.state.cstartdate}
+                            onChangeText={(cstartdate) => this.setState({cstartdate})}  />
+                        </View>
+                        </View>
+
+                        <View style={{}}>
+                            <Text style={{fontSize:18}}>End Date</Text>
+                            <View style={{
+                                flexDirection:'row',
+                                alignItems:'center',
+                                backgroundColor:'#4F45F01a',
+                                marginTop:5,
+                                height:45,
+                                width:Dimensions.get('window').width/3,
+                                borderRadius:7,
+                                }}>
+                        <TextInput style = {styles.iconInputField}
+                            underlineColorAndroid = "transparent"
+                            placeholder = "End Date"
+                            placeholderTextColor = "#0000005a"
+                            autoCapitalize = "none"
+                            value={this.state.cenddate}
+                            onChangeText={(cenddate) => this.setState({cenddate})}  />
+                        </View>
+                        </View>
+                        </View>
+
+                        <View style={{marginHorizontal:20,marginTop:25}}>
+                            <Text style={{fontSize:18}}>Total Experience</Text>
+                        </View>
+                        <View style={styles.iconInputContainerModal}>
+                        <TextInput style = {styles.iconInputField}
+                            underlineColorAndroid = "transparent"
+                            placeholder = "Total Experience"
+                            placeholderTextColor = "#0000005a"
+                            autoCapitalize = "none"
+                            value={this.state.ctotalexperience}
+                            onChangeText={(ctotalexperience) => this.setState({ctotalexperience})}  />
+                        </View>
+
+                        <TouchableOpacity onPress={()=>{this.state.editting == true ? this.onCompanyModalSubmitClick(true) : this.onCompanyModalSubmitClick(false) }}  style={{width:"70%",height:55,borderRadius:20,alignSelf:"center",alignItems:"center",justifyContent:"center",marginTop:50,marginBottom:50,backgroundColor:"#4F45F0"}}>
+                            <Text style={{color:"#fff"}}>{this.state.editting == true ? 'Update Details' : 'Add Details'}</Text>
+                        </TouchableOpacity>
+
+                    </KeyboardAwareScrollView>
+            </Modal>
+        <DropdownAlert inactiveStatusBarStyle="light-content" inactiveStatusBarBackgroundColor="#4F45F0" ref={ref => this.dropDownAlertRef = ref} />
+
         </View>
       );
     }
@@ -490,6 +598,16 @@ const styles = StyleSheet.create({
         marginTop:5,
         height:45,
         width:Dimensions.get('window').width-40,
+        borderRadius:7,
+    },
+    iconInputContainerModal:{
+        flexDirection:'row',
+        alignItems:'center',
+        backgroundColor:'#4F45F01a',
+        marginLeft:20,
+        marginRight:20,
+        marginTop:5,
+        height:45,
         borderRadius:7,
     },
     iconInputField:{

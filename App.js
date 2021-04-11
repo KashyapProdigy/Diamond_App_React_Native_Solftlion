@@ -45,6 +45,13 @@ import RateApp from './src/screens/common/rateapp';
 /**
  * Seller Imports For Root Stack
 */
+import LoginSeller from './src/screens/seller/loginseller';
+import RegisterSeller from './src/screens/seller/registerseller';
+import MainTabSeller from './src/screens/seller/maintabseller';
+import FeaturedSeller from './src/screens/seller/featuredseller';
+import BestSellSeller from './src/screens/seller/bestsellseller';
+import FavouriteSeller from './src/screens/seller/favouriteseller';
+import NotificationSeller from './src/screens/seller/notificationseller';
 
 
 
@@ -81,6 +88,15 @@ const App = () =>{
         <RootStack.Screen name="SettingProvider" component={SettingProvider} />
         <RootStack.Screen name="CreateJobProvider" component={CreateJobProvider} />
         <RootStack.Screen name="EmployeeApplied" component={EmployeeApplied} />
+
+
+        <RootStack.Screen name="LoginSeller" component={LoginSeller} />
+        <RootStack.Screen name="RegisterSeller" component={RegisterSeller} />
+        <RootStack.Screen name="MainTabSeller" component={MainTabSeller} />
+        <RootStack.Screen name="FeaturedSeller" component={FeaturedSeller} />
+        <RootStack.Screen name="BestSellSeller" component={BestSellSeller} />
+        <RootStack.Screen name="FavouriteSeller" component={FavouriteSeller} />
+        <RootStack.Screen name="NotificationSeller" component={NotificationSeller} />
 
 
       </RootStack.Navigator>
