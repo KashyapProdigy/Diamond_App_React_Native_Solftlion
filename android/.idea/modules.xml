@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Dimand.iml" filepath="$PROJECT_DIR$/.idea/modules/Dimand.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Dimand.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Dimand.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/211450176/Dimand.react-native-appearance.iml" filepath="$PROJECT_DIR$/.idea/modules/211450176/Dimand.react-native-appearance.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-2141359198/Dimand.react-native-community_masked-view.iml" filepath="$PROJECT_DIR$/.idea/modules/-2141359198/Dimand.react-native-community_masked-view.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1416477835/Dimand.react-native-gesture-handler.iml" filepath="$PROJECT_DIR$/.idea/modules/-1416477835/Dimand.react-native-gesture-handler.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/1488384945/Dimand.react-native-image-picker.iml" filepath="$PROJECT_DIR$/.idea/modules/1488384945/Dimand.react-native-image-picker.iml" />

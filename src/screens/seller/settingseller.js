@@ -50,7 +50,7 @@ export default class Splash extends React.Component {
     }
 
     onShippingAddressClick(){
-        // this.props.navigation.navigate('AboutUs');
+        this.props.navigation.navigate('ShippingSeller');
     }
 
     onWishlistClick(){
@@ -66,7 +66,7 @@ export default class Splash extends React.Component {
     }
 
     onPaymentOptionClick(){
-        // this.props.navigation.navigate('RateApp');
+        this.props.navigation.navigate('PaymentSeller');
     }
 
     onNotificationClick(){

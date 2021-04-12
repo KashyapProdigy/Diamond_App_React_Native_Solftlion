@@ -111,7 +111,7 @@ export default class Splash extends React.Component {
     }
 
     onContinueClick(){
-        this.props.navigation.goBack();
+        this.props.navigation.navigate('ShippingSeller');
     }
 
     onNotificationClick(){

@@ -167,7 +167,7 @@ export default class Splash extends React.Component {
     }
 
     onProductClick(){
-        // this.dropDownAlertRef.alertWithType('success', 'Product Description !', "",null,1500)
+        this.props.navigation.navigate('ProductPageSeller');
     }
 
     onCategoryClick(){

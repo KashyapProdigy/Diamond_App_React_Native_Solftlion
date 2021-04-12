@@ -9,7 +9,6 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { AppearanceProvider } from 'react-native-appearance';
 
 /**
  * Common Screen Imports For Root Stack
@@ -52,6 +51,11 @@ import FeaturedSeller from './src/screens/seller/featuredseller';
 import BestSellSeller from './src/screens/seller/bestsellseller';
 import FavouriteSeller from './src/screens/seller/favouriteseller';
 import NotificationSeller from './src/screens/seller/notificationseller';
+import ProductPageSeller from './src/screens/seller/productpageseller';
+import ShippingSeller from './src/screens/seller/shippingseller';
+import CreateAddressSeller from './src/screens/seller/createaddressseller';
+import PaymentSeller from './src/screens/seller/paymentseller';
+import CreateCardSeller from './src/screens/seller/createcardseller';
 
 
 
@@ -97,7 +101,12 @@ const App = () =>{
         <RootStack.Screen name="BestSellSeller" component={BestSellSeller} />
         <RootStack.Screen name="FavouriteSeller" component={FavouriteSeller} />
         <RootStack.Screen name="NotificationSeller" component={NotificationSeller} />
-
+        <RootStack.Screen name="ProductPageSeller" component={ProductPageSeller} />
+        <RootStack.Screen name="ShippingSeller" component={ShippingSeller} />
+        <RootStack.Screen name="CreateAddressSeller" component={CreateAddressSeller} />
+        <RootStack.Screen name="PaymentSeller" component={PaymentSeller} />
+        <RootStack.Screen name="CreateCardSeller" component={CreateCardSeller} />
+        
 
       </RootStack.Navigator>
     </NavigationContainer>
