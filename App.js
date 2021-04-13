@@ -56,7 +56,8 @@ import ShippingSeller from './src/screens/seller/shippingseller';
 import CreateAddressSeller from './src/screens/seller/createaddressseller';
 import PaymentSeller from './src/screens/seller/paymentseller';
 import CreateCardSeller from './src/screens/seller/createcardseller';
-
+import CheckoutSeller from './src/screens/seller/checkoutseller';
+import OrderCompletionSeller from './src/screens/seller/ordercompletionseller';
 
 
 const RootStack = createStackNavigator();
@@ -106,7 +107,9 @@ const App = () =>{
         <RootStack.Screen name="CreateAddressSeller" component={CreateAddressSeller} />
         <RootStack.Screen name="PaymentSeller" component={PaymentSeller} />
         <RootStack.Screen name="CreateCardSeller" component={CreateCardSeller} />
-        
+        <RootStack.Screen name="CheckoutSeller" component={CheckoutSeller} />
+        <RootStack.Screen name="OrderCompletionSeller" component={OrderCompletionSeller} />
+
 
       </RootStack.Navigator>
     </NavigationContainer>

@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import org.reactnative.maskedview.RNCMaskedViewPackage;
 // @react-native-picker/picker
 import com.reactnativecommunity.picker.RNCPickerPackage;
+// lottie-react-native
+import com.airbnb.android.react.lottie.LottiePackage;
 // react-native-appearance
 import io.expo.appearance.RNCAppearancePackage;
 // react-native-gesture-handler
@@ -76,6 +78,7 @@ public class PackageList {
       new MainReactPackage(mConfig),
       new RNCMaskedViewPackage(),
       new RNCPickerPackage(),
+      new LottiePackage(),
       new RNCAppearancePackage(),
       new RNGestureHandlerPackage(),
       new ImagePickerPackage(),

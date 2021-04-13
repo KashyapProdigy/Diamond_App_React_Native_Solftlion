@@ -121,7 +121,7 @@ export default class Splash extends React.Component {
     }
 
     onCheckoutClick(){        
-        this.props.navigation.navigate('Home');
+        this.props.navigation.navigate('CheckoutSeller');
     }
 
     onAddCardClick(){
