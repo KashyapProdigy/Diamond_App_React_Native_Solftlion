@@ -360,6 +360,10 @@
         "source": "/Users/kashyapkarkar/Desktop/Diamond_App_React_Native_Solftlion/android/app/build/generated/res/react/debug/drawable-xxxhdpi/node_modules_reactnavigation_drawer_src_views_assets_toggledrawericon.png"
     },
     {
+        "merged": "/Users/kashyapkarkar/Desktop/Diamond_App_React_Native_Solftlion/android/app/build/intermediates/res/merged/debug/raw_src_assets_animation_success.json.flat",
+        "source": "/Users/kashyapkarkar/Desktop/Diamond_App_React_Native_Solftlion/android/app/build/generated/res/react/debug/raw/src_assets_animation_success.json"
+    },
+    {
         "merged": "/Users/kashyapkarkar/Desktop/Diamond_App_React_Native_Solftlion/android/app/build/intermediates/res/merged/debug/drawable-mdpi_node_modules_reactnativedropdownalert_assets_info.png.flat",
         "source": "/Users/kashyapkarkar/Desktop/Diamond_App_React_Native_Solftlion/android/app/build/generated/res/react/debug/drawable-mdpi/node_modules_reactnativedropdownalert_assets_info.png"
     },

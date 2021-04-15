@@ -8,18 +8,24 @@ import {
     Image,
     Dimensions, 
     TouchableOpacity,
-    StatusBar
+    StatusBar,
+    Keyboard
   } from 'react-native';
 
+import AppLoader from '../component/loader';
+import DropdownAlert from 'react-native-dropdownalert';
+import AuthServices from '../../api/authservices';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetworkCheck from '../../utils/networkcheck';
 
 export default class Splash extends React.Component {
     constructor (props) {
       super(props);
       this.state = {
-          email:'',
+          mobile:'',
           password:'',
           togglePasswordVisibility:true,
-          loading:false,
+          appLoading:false,
       };
 
       this.onForgotPasswordClick = this.onForgotPasswordClick.bind(this);
@@ -35,16 +41,78 @@ export default class Splash extends React.Component {
         this.props.navigation.navigate('ForgotPassword');
     }
 
-    onLoginClick(){
-        this.props.navigation.replace('MainTabProvider');
+    async onLoginClick(){
+
+        Keyboard.dismiss();
+
+        const isConnected = await NetworkCheck.isNetworkAvailable();
+
+        if (isConnected) {  
+
+            if(this.state.mobile.trim() == ''){
+                this.setState({mobile:''},()=>{this.mobileInputRef.focus(); })
+                this.dropDownAlertRef.alertWithType('error',"Mobile Number cannot be blank");
+              return
+            }
+            if(this.state.mobile.length < 10 ){
+                this.mobileInputRef.focus();
+                this.dropDownAlertRef.alertWithType('error',"Number should contain atleast 10 digits");
+              return
+            }
+            if(this.state.password == ''){
+                this.passwordInputRef.focus();
+                this.dropDownAlertRef.alertWithType('error',"Password cannot be blank");
+              return
+            }
+            if(this.state.password.length < 6 ){
+                this.passwordInputRef.focus();
+                this.dropDownAlertRef.alertWithType('error',"Password should contain atleast 6 letters");
+              return
+            }
+
+            let myFormData = new FormData();
+            myFormData.append("mobile_no",this.state.mobile)
+            myFormData.append("password", this.state.password)
+            myFormData.append("type",1)
+            myFormData.append("device_type",'test123')
+            myFormData.append("device_token",'test123')
+
+            try {
+                this.setState({appLoading: true})
+                const { data } = await AuthServices.LoginUser(myFormData)
+                console.log(data);
+
+                if( data.status == 0 ){
+                    this.setState({appLoading: false})
+                    this.dropDownAlertRef.alertWithType('error', 'Invalid Number or Password', "Try Again");
+                }
+
+                if( data.status == 1){
+                    this.setState({appLoading: false})
+                    await AsyncStorage.setItem('User',JSON.stringify(data.userdata[0]));
+                    this.dropDownAlertRef.alertWithType('success', 'Login', "Login Success");
+                    this.props.navigation.replace('MainTabProvider');
+                }
+                this.setState({appLoading: false})
+            }
+            catch(error){
+                console.log(error)
+                this.setState({appLoading: false})
+                console.log(error.data)
+                this.dropDownAlertRef.alertWithType('error', 'Failed', "Authentication Failed");
+            }
+        }
+        else{
+            this.dropDownAlertRef.alertWithType('error', 'No Internet Connection', "please check your device connection");
+        }
     }
 
     onFacebookClick(){
-        this.props.navigation.replace('MainTabProvider');
+        // this.props.navigation.replace('MainTabProvider');
     }
 
     onGoogleClick(){
-        this.props.navigation.replace('MainTabProvider');
+        // this.props.navigation.replace('MainTabProvider');
     }
 
     onRegisterClick(){
@@ -52,7 +120,7 @@ export default class Splash extends React.Component {
     }
 
     render () {
-      return (
+       return (
         <View style={styles.maincontainer}>
         <StatusBar
            backgroundColor = "#4F45F0"
@@ -65,20 +133,28 @@ export default class Splash extends React.Component {
         <View style={styles.subcontainer2}>
 
             <View style={styles.iconInputContainer}>
-            <Image source={require('../../assets/icon/gmail.png')} style={styles.iconInputImage} resizeMode='contain'></Image>
+            <Image source={require('../../assets/icon/mobile-phone.png')} style={styles.iconInputImage} resizeMode='contain'></Image>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.mobileInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.passwordInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
-                placeholder = "Email Address"
+                placeholder = "Mobile Number"
                 placeholderTextColor = "#000"
                 autoCapitalize = "none"
-                keyboardType="email-address"
-                onChangeText={(email) => this.setState({email})}  />
+                keyboardType="phone-pad"
+                onChangeText={(mobile) => this.setState({mobile})}  />
             </View>
 
 
             <View style={styles.iconInputContainer}>
             <Image source={require('../../assets/icon/padlock.png')} style={styles.iconInputImage} resizeMode='contain'></Image>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.passwordInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { Keyboard.dismiss() }}
+                blurOnSubmit={false}            
                 underlineColorAndroid = "transparent"
                 placeholder = "Password"
                 placeholderTextColor = "#000"
@@ -95,7 +171,7 @@ export default class Splash extends React.Component {
                 <Text style={styles.loginButtonText}>Login</Text>
             </TouchableOpacity>
 
-            <Text style={{fontSize:18,color:'#000',alignSelf:'center',marginTop:20}}>Or Continue With</Text>
+            <Text style={{fontSize:18,color:'#000',alignSelf:'center',marginTop:30}}>Or Continue With</Text>
 
             <View style={{flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
                 <TouchableOpacity onPress={this.onFacebookClick}style={styles.socialButtonContainer}>
@@ -118,8 +194,11 @@ export default class Splash extends React.Component {
 
         </View>
         </ImageBackground> 
+        <DropdownAlert inactiveStatusBarStyle="light-content" inactiveStatusBarBackgroundColor="#4F45F0" ref={ref => this.dropDownAlertRef = ref} />
+        <AppLoader isAppLoading={this.state.appLoading}/>
         </View>
       );
+    
     }
 }
 
@@ -129,12 +208,12 @@ const styles = StyleSheet.create({
         backgroundColor:"#fff" 
     },
     subcontainer1:{
-        height:Dimensions.get('window').height/100*20,
+        height:Dimensions.get('window').height/100*15,
         justifyContent:'center',
         marginLeft:'15%'
     },
     subcontainer2:{
-        height:Dimensions.get('window').height/100*70,
+        height:Dimensions.get('window').height/100*85,
         alignItems:'center',
         marginTop:10
     },

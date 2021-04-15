@@ -21,6 +21,9 @@ import {
   import Icon7 from 'react-native-vector-icons/EvilIcons';
   import Icon8 from 'react-native-vector-icons/SimpleLineIcons';
 
+  import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 export default class Splash extends React.Component {
     constructor (props) {
       super(props);
@@ -63,10 +66,11 @@ export default class Splash extends React.Component {
     onRateAppClick(){
         this.props.navigation.navigate('RateApp');
     }
-
-    onLogoutCLick(){
+ 
+    async onLogoutCLick(){
+        await AsyncStorage.removeItem('User');
         this.props.navigation.popToTop();
-        this.props.navigation.replace('LandingPage');
+        this.props.navigation.navigate("LandingPage");
     }
 
     render () {
@@ -80,9 +84,9 @@ export default class Splash extends React.Component {
         <View style={{backgroundColor : '#4F45F0' , flex:8}}>
 
             <TouchableOpacity onPress={this.onBackButtonClick}
-            style={{marginTop:17,marginLeft:20,flexDirection:'row',alignItems:'center'}}>
-                <Icon5 name="left" color={'white'} size={26} style={{textAlignVertical:'center'}} />
-                <Text style={{color:'white',fontSize:22,marginLeft:4,textAlignVertical:'center'}}>Setting</Text>
+            style={{marginTop:20,marginLeft:20,flexDirection:'row',alignItems:'center'}}>
+                <Icon5 name="left" color={'white'} size={26} />
+                <Text style={{color:'white',fontSize:22,marginLeft:4}}>Setting</Text>
             </TouchableOpacity>
 
         </View>

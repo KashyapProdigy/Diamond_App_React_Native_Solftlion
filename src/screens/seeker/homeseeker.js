@@ -10,7 +10,9 @@ import {
     Dimensions, 
     TouchableOpacity,
     KeyboardAvoidingView ,
-    StatusBar
+    StatusBar,
+    BackHandler,
+    Alert
   } from 'react-native';
 
   import DropdownAlert from 'react-native-dropdownalert';
@@ -23,6 +25,8 @@ import {
   import Icon6 from 'react-native-vector-icons/Ionicons';
   import Icon7 from 'react-native-vector-icons/EvilIcons';
   import Icon8 from 'react-native-vector-icons/Fontisto';
+
+  import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class Splash extends React.Component {
     constructor (props) {
@@ -113,6 +117,7 @@ export default class Splash extends React.Component {
                 value: "demo"
             }
         ],
+          userdata:{},
           searchstring:'',
           togglePasswordVisibility:true,
           loading:false,
@@ -126,7 +131,15 @@ export default class Splash extends React.Component {
       this.onSaveJobClick = this.onSaveJobClick.bind(this);
     }
 
-    componentDidMount(){}
+    componentDidMount(){
+        this.getUserData();
+    }
+
+    async getUserData(){
+        var value = await AsyncStorage.getItem('User');
+        value = JSON.parse(value);
+        this.setState({userdata: value},()=>{console.log(this.state.userdata)})
+    }
 
     onFilterClick(){
         this.props.navigation.navigate('HomeSeeker');
@@ -169,7 +182,6 @@ export default class Splash extends React.Component {
            backgroundColor = "#4F45F0"
            barStyle = "light-content"
          />
-        <DropdownAlert inactiveStatusBarStyle="light-content" inactiveStatusBarBackgroundColor="#4F45F0" ref={ref => this.dropDownAlertRef = ref} />
         <ImageBackground source={require('../../assets/image/splash_bg.png')} style={styles.backgroundImage} resizeMode='stretch' >
         <View style={{backgroundColor : '#4F45F0' , flex:25}} >
 
@@ -186,7 +198,7 @@ export default class Splash extends React.Component {
             </View>
 
             <View style={{marginTop:20,marginLeft:20}}>
-                <Text style={{color:'white',fontSize:22}}>Welcome, User</Text>
+                <Text style={{color:'white',fontSize:22}}>Welcome, {this.state.userdata.firstname}</Text>
             </View>
 
             <View style={styles.iconInputContainer}>
@@ -275,6 +287,7 @@ export default class Splash extends React.Component {
 
         </View>
         </ImageBackground> 
+        <DropdownAlert inactiveStatusBarStyle="light-content" inactiveStatusBarBackgroundColor="#4F45F0" ref={ref => this.dropDownAlertRef = ref} />
         </View>
       );
     }

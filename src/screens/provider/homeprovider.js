@@ -25,10 +25,13 @@ import {
   import Icon8 from 'react-native-vector-icons/SimpleLineIcons';
   import Icon9 from 'react-native-vector-icons/Fontisto';
 
+  import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export default class Splash extends React.Component {
     constructor (props) {
       super(props);
       this.state = {
+          userdata:{},
           togglePasswordVisibility:true,
           loading:false,
       };
@@ -42,7 +45,15 @@ export default class Splash extends React.Component {
 
     }
 
-    componentDidMount(){}
+    componentDidMount(){
+        this.getUserData();
+    }
+
+    async getUserData(){
+        var value = await AsyncStorage.getItem('User');
+        value = JSON.parse(value);
+        this.setState({userdata: value},()=>{console.log(this.state.userdata)})
+    }
 
     onNotificationClick(){
         this.props.navigation.navigate('HomeProvider');
@@ -99,7 +110,7 @@ export default class Splash extends React.Component {
         <View style={{ flex:92 ,}}>
 
         <View style={{marginTop:20,marginLeft:20}}>
-                <Text style={{color:'#4F45F0',fontSize:22}}>Welcome, User</Text>
+                <Text style={{color:'#4F45F0',fontSize:22}}>Welcome, {this.state.userdata.firstname}</Text>
         </View>
 
         <View style={{flexDirection:'row',marginTop:35,marginHorizontal:13,justifyContent:'space-between'}}>

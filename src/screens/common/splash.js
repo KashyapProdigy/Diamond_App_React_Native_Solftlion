@@ -10,18 +10,43 @@ import {
   } from 'react-native';
 
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export default class Splash extends React.Component {
     constructor (props) {
       super(props);
-      this.state = {};
+      this.state = {
+          userdata:null,
+      };
     }
 
     componentDidMount(){
         setTimeout(() => {
-            this.props.navigation.replace('LandingPage')
-        }, 2000);
+            this.getUserData();
+        }, 3000);
     }
 
+    async getUserData() {
+        var value = await AsyncStorage.getItem('User');
+        if (value == null){
+            this.props.navigation.replace('LandingPage');
+        } 
+        else {
+            AsyncStorage.getItem("User").then((value) => {
+                var mainValue = JSON.parse(value)
+                console.log(mainValue);
+                if (mainValue.type == 0) {
+                    this.props.navigation.replace('MainTabSeeker');
+                } 
+                 else if (mainValue.type == 1) {
+                    this.props.navigation.replace("MainTabProvider");
+                } 
+                else if (mainValue.type == 2) {
+                    this.props.navigation.replace("MainTabSeller");
+                } 
+            }).done();
+        }
+    }
 
     render () {
       return (
@@ -36,7 +61,7 @@ export default class Splash extends React.Component {
                 <Image source={require('../../assets/image/splash_logo.png')} style={{height:400,width:400}} resizeMode='contain'></Image>
                 </View>
 
-                <Text style={styles.logotext}>Diamand</Text>
+                <Text style={styles.logotext}>Di'mand</Text>
         </View>
         </ImageBackground> 
         </View>

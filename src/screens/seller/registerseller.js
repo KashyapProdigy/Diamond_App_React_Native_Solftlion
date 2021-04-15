@@ -8,8 +8,16 @@ import {
     Image,
     Dimensions, 
     TouchableOpacity,
-    StatusBar
+    StatusBar,
+    Keyboard
   } from 'react-native';
+
+import AppLoader from '../component/loader';
+import DropdownAlert from 'react-native-dropdownalert';
+import AuthServices from '../../api/authservices';
+import NetworkCheck from '../../utils/networkcheck';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default class Splash extends React.Component {
@@ -19,10 +27,10 @@ export default class Splash extends React.Component {
           firstname:'',
           lastname:'',
           email:'',
-          mobile1:'',
+          mobile:'',
           password:'',
           togglePasswordVisibility:true,
-          loading:false,
+          appLoading:false,
       };
 
 
@@ -39,20 +47,114 @@ export default class Splash extends React.Component {
     }
 
     onFacebookClick(){
-        this.props.navigation.replace('MainTabSeller');
+        // this.props.navigation.replace('MainTabSeller');
     }
 
     onGoogleClick(){
-        this.props.navigation.replace('MainTabSeller');
+        // this.props.navigation.replace('MainTabSeller');
     }
 
-    onRegisterClick(){
-        this.props.navigation.replace('MainTabSeller');
+    async onRegisterClick(){
+
+        Keyboard.dismiss();
+
+        const isConnected = await NetworkCheck.isNetworkAvailable()
+
+        if (isConnected) {  
+
+        if(this.state.firstname.trim() == ''){
+            this.setState({firstname:''},()=>{this.firstNameInputRef.focus(); })
+            this.dropDownAlertRef.alertWithType('error',"First Name cannot be blank");
+          return
+        }
+        if(this.state.lastname.trim() == ''){
+            this.setState({lastname:''},()=>{this.lastNameInputRef.focus(); })
+            this.dropDownAlertRef.alertWithType('error',"Last Name cannot be blank");
+          return
+        }
+        if(this.state.email.trim() == ''){
+            this.setState({email:''},()=>{this.emailInputRef.focus(); })
+            this.dropDownAlertRef.alertWithType('error',"Email cannot be blank");
+          return
+        }
+        if(this.state.email.length > 0){
+            let expression = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            if (expression.test(this.state.email)) {} 
+            else {
+                this.setState({email:''},()=>{this.emailInputRef.focus(); })
+                this.dropDownAlertRef.alertWithType('error',"Email format is invalid");
+                return  
+            }
+        }
+        if(this.state.mobile.trim() == ''){
+            this.setState({mobile:''},()=>{this.mobileInputRef.focus(); })
+            this.dropDownAlertRef.alertWithType('error',"Mobile Number cannot be blank");
+          return
+        }
+        if(this.state.mobile.length < 10 ){
+            this.mobileInputRef.focus();
+            this.dropDownAlertRef.alertWithType('error',"Number should contain atleast 10 digits");
+          return
+        }
+        if(this.state.password == ''){
+            this.passwordInputRef.focus()
+            this.dropDownAlertRef.alertWithType('error',"Password cannot be blank");
+          return
+        }
+        if(this.state.password.length < 6 ){
+            this.passwordInputRef.focus();
+            this.dropDownAlertRef.alertWithType('error',"Password should contain atleast 6 letters");
+          return
+        }
+
+        let myFormData = new FormData();
+        myFormData.append("firstname",this.state.firstname)
+        myFormData.append("lastname", this.state.lastname)
+        myFormData.append("email", this.state.email)
+        myFormData.append("mobile_no", this.state.mobile)
+        myFormData.append("password", this.state.password)
+        myFormData.append("type",2)
+
+        try {
+            this.setState({appLoading: true})
+            const { data } = await AuthServices.RegisterUser(myFormData)
+            console.log(data);
+
+            if( data.status == 0 ){
+                this.setState({appLoading: false})
+                if(data.existing == 1){
+                    this.mobileInputRef.focus();
+                    this.dropDownAlertRef.alertWithType('error', 'Number Already Registered', "try diffrent number");
+                }else{
+                    this.dropDownAlertRef.alertWithType('error', 'Something went wrong ...', "Try Again");
+                }
+            }
+
+            if( data.status == 1){
+                this.setState({appLoading: false})
+                await AsyncStorage.setItem('User',JSON.stringify(data.userdata[0]));
+                this.dropDownAlertRef.alertWithType('success',"Registered Successfully !");
+                this.props.navigation.replace('MainTabSeller');
+            }
+
+            this.setState({appLoading: false})
+          }
+          catch(error){
+            console.log(error)
+            this.setState({appLoading: false})
+            console.log(error.data)
+            this.dropDownAlertRef.alertWithType('error', 'Failed', "Authentication Failed");
+          }
+        }
+        else{
+            this.dropDownAlertRef.alertWithType('error', 'No Internet Connection', "please check your device connection");
+        }
     }
 
     render () {
       return (
         <View style={styles.maincontainer}>
+            
         <StatusBar
            backgroundColor = "#4F45F0"
            barStyle = "light-content"
@@ -61,12 +163,19 @@ export default class Splash extends React.Component {
         <View style={styles.subcontainer1}>
             <Text style={styles.pageheader}>Register</Text>
         </View>
+
         <View style={styles.subcontainer2}>
+
+        <KeyboardAwareScrollView style={{backgroundColor:"transparent"}} extraHeight={100} enableOnAndroid enableAutomaticScroll>
 
             <View style={{flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
                 <View style={styles.socialButtonContainer}>
                 <Image source={require('../../assets/icon/user.png')} style={styles.socialButtonImage} resizeMode='contain'></Image>
                 <TextInput style = {styles.socialButtonText}
+                ref={(input) => { this.firstNameInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.lastNameInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "First Name"
                 placeholderTextColor = "#000"
@@ -77,6 +186,10 @@ export default class Splash extends React.Component {
                 <View style={styles.socialButtonContainer}>
                 <Image source={require('../../assets/icon/user.png')} style={styles.socialButtonImage} resizeMode='contain'></Image>
                 <TextInput style = {styles.socialButtonText}
+                ref={(input) => { this.lastNameInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.emailInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Last Name"
                 placeholderTextColor = "#000"
@@ -88,6 +201,10 @@ export default class Splash extends React.Component {
             <View style={styles.iconInputContainer}>
             <Image source={require('../../assets/icon/gmail.png')} style={styles.iconInputImage} resizeMode='contain'></Image>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.emailInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.mobileInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Email Address"
                 placeholderTextColor = "#000"
@@ -99,17 +216,25 @@ export default class Splash extends React.Component {
             <View style={styles.iconInputContainer}>
             <Image source={require('../../assets/icon/mobile-phone.png')} style={styles.iconInputImage} resizeMode='contain'></Image>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.mobileInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.passwordInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Mobile Number"
                 placeholderTextColor = "#000"
                 autoCapitalize = "none"
                 keyboardType="number-pad"
-                onChangeText={(mobile1) => this.setState({mobile1})}  />
+                onChangeText={(mobile) => this.setState({mobile})}  />
             </View>
 
             <View style={styles.iconInputContainer}>
             <Image source={require('../../assets/icon/padlock.png')} style={styles.iconInputImage} resizeMode='contain'></Image>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.passwordInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { Keyboard.dismiss() }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Password"
                 placeholderTextColor = "#000"
@@ -122,7 +247,9 @@ export default class Splash extends React.Component {
                 <Text style={styles.loginButtonText}>Register</Text>
             </TouchableOpacity>
 
-            <Text style={{fontSize:18,color:'#000',alignSelf:'center',marginTop:20}}>Or Continue With</Text>
+
+
+            <Text style={{fontSize:18,color:'#000',alignSelf:'center',marginTop:30}}>Or Continue With</Text>
 
             <View style={{flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
                 <TouchableOpacity onPress={this.onFacebookClick}style={styles.socialButtonContainer}>
@@ -136,18 +263,22 @@ export default class Splash extends React.Component {
                 </TouchableOpacity>
             </View>
 
-            <Text style={{marginTop:15,fontSize:17,color:'#000',alignSelf:'center'}}>by continuing you confirm that you agree</Text>
-            <Text style={{marginTop:2,fontSize:17,color:'#000',alignSelf:'center'}}>with our Terms and Condition</Text>
-            <View style={{flexDirection:'row',marginTop:25}}>
-            <Text style={{fontSize:17,color:'#000',alignSelf:'center'}}>Already have an account?</Text>
+            <Text style={{marginTop:15,fontSize:16,color:'#000',alignSelf:'center'}}>by continuing you confirm that you agree</Text>
+            <Text style={{marginTop:2,fontSize:16,color:'#000',alignSelf:'center'}}>with our Terms and Condition</Text>
+
+            <View style={{flexDirection:'row',alignSelf:"center",marginTop:25,marginBottom:20}}>
+            <Text style={{fontSize:18,color:'#000',alignSelf:'center'}}>Already have an account?</Text>
             <TouchableOpacity onPress={this.onLoginClick}>
-                <Text style={{fontSize:17,color:'#4F45F0',alignSelf:'center'}}>  LOGIN</Text>
+                <Text style={{fontSize:18,color:'#4F45F0',alignSelf:'center'}}>  LOGIN</Text>
             </TouchableOpacity>
             </View>
 
+            </KeyboardAwareScrollView>
 
         </View>
         </ImageBackground> 
+        <DropdownAlert inactiveStatusBarStyle="light-content" inactiveStatusBarBackgroundColor="#4F45F0" ref={ref => this.dropDownAlertRef = ref} />
+        <AppLoader isAppLoading={this.state.appLoading}/>
         </View>
       );
     }
@@ -164,7 +295,7 @@ const styles = StyleSheet.create({
         marginLeft:'15%'
     },
     subcontainer2:{
-        height:Dimensions.get('window').height/100*70,
+        height:Dimensions.get('window').height/100*85,
         alignItems:'center',
     },
 
@@ -201,7 +332,7 @@ const styles = StyleSheet.create({
     iconInputField:{
         marginLeft:5,
         flex:1,
-        color:"#000"
+        color:"#4F45F0"
     },
     iconInputImage:{
         height:25,

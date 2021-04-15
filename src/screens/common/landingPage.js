@@ -7,7 +7,9 @@ import {
     Image,
     Dimensions, 
     TouchableOpacity,
-    StatusBar
+    StatusBar,
+    BackHandler,
+    Alert
   } from 'react-native';
 
 
@@ -33,7 +35,27 @@ export default class Splash extends React.Component {
       this.onSellerClick = this.onSellerClick.bind(this);
     }
 
-    componentDidMount(){}
+    componentDidMount(){
+        // BackHandler.addEventListener('hardwareBackPress', this.handleBackButton.bind(this));
+    }
+
+    // componentWillUnmount() {
+    //     BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton.bind(this));
+    //   }
+
+    //   handleBackButton = () => {
+    //     Alert.alert(
+    //       `Exit Di'mand`,
+    //       `close this app ?`,
+    //       [
+    //         {text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+    //         {text: 'Yes', onPress: () =>  BackHandler.exitApp()},
+    //       ],
+    //       {cancelable: false},
+    //     );
+    //       return true;
+    //   };
+  
 
     onSeekerClick(){
         this.setState({selectedButtonIndex:1})

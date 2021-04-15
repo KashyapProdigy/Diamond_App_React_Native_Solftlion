@@ -24,6 +24,7 @@ import {
   import Icon10 from 'react-native-vector-icons/MaterialIcons';
 
 import { ScrollView } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class Splash extends React.Component {
     constructor (props) {
@@ -73,9 +74,10 @@ export default class Splash extends React.Component {
         this.props.navigation.navigate('NotificationSeller');
     }
 
-    onLogoutCLick(){
+    async onLogoutCLick(){
+        await AsyncStorage.removeItem('User');
         this.props.navigation.popToTop();
-        this.props.navigation.replace('LandingPage');
+        this.props.navigation.navigate("LandingPage");
     }
 
     render () {

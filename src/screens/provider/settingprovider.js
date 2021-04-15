@@ -21,6 +21,9 @@ import {
   import Icon7 from 'react-native-vector-icons/EvilIcons';
   import Icon8 from 'react-native-vector-icons/SimpleLineIcons';
 
+  import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 export default class Splash extends React.Component {
     constructor (props) {
       super(props);
@@ -64,9 +67,10 @@ export default class Splash extends React.Component {
         this.props.navigation.navigate('RateApp');
     }
  
-    onLogoutCLick(){
+    async onLogoutCLick(){
+        await AsyncStorage.removeItem('User');
         this.props.navigation.popToTop();
-        this.props.navigation.replace('LandingPage');
+        this.props.navigation.navigate("LandingPage");
     }
 
     render () {

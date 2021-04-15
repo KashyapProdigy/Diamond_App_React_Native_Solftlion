@@ -27,6 +27,7 @@ import {
   import Icon10 from 'react-native-vector-icons/MaterialIcons';
 
   import { ScrollView } from 'react-native-gesture-handler';
+  import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class Splash extends React.Component {
     constructor (props) {
@@ -112,6 +113,7 @@ export default class Splash extends React.Component {
                 image: require(`../../assets/productimage/3.png`)
             }
         ],
+          userdata:{},
           searchstring:'',
           togglePasswordVisibility:true,
           loading:false,
@@ -130,7 +132,15 @@ export default class Splash extends React.Component {
       this.onSaveProductClick = this.onSaveProductClick.bind(this);
     }
 
-    componentDidMount(){}
+    componentDidMount(){
+        this.getUserData();
+    }
+
+    async getUserData(){
+        var value = await AsyncStorage.getItem('User');
+        value = JSON.parse(value);
+        this.setState({userdata: value},()=>{console.log(this.state.userdata)})
+    }
 
     generateRandomColor() {
         var letters = '0123456789ABCDEF';
