@@ -91,6 +91,7 @@ export default class Splash extends React.Component {
                     this.setState({appLoading: false})
                     await AsyncStorage.setItem('User',JSON.stringify(data.userdata[0]));
                     this.dropDownAlertRef.alertWithType('success', 'Login', "Login Success");
+                    this.props.navigation.popToTop();
                     this.props.navigation.replace('MainTabProvider');
                 }
                 this.setState({appLoading: false})

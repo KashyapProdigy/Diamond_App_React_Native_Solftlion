@@ -1,4 +1,5 @@
 import React from 'react';
+import {BackHandler} from 'react-native';
 
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';

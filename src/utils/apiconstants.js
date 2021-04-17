@@ -1,9 +1,19 @@
 //API URL Constants
 
+//BASE
 export const BASE_URL = "https://spsofttech.com/projects/diamond/api/";
-// export const IMAGEURI="http://tapntrade.com/Tapndeal/public/product/";
-// export const BANNERURI="http://tapntrade.com/Tapndeal/public/Banner/";
-// export const PROFILEURI="http://tapntrade.com/Tapndeal/public/profile/";
 
+
+//Common Routes
 export const LOGIN = BASE_URL + "login";
 export const REGISTER = BASE_URL + "register";
+
+//Seeker Routes
+
+//Provider Routes
+export const PROVIDER_HOME = BASE_URL + "providerhome";
+export const POST_JOB = BASE_URL + "postjob";
+export const TOTAL_POST = BASE_URL + "totalpost";
+export const TOGGLE_POST_STATUS = BASE_URL + "postactivedeactive";
+
+//Seller Routes

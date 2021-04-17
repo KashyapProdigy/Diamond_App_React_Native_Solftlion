@@ -10,7 +10,8 @@ import {
     Dimensions, 
     TouchableOpacity,
     ScrollView,
-    StatusBar
+    StatusBar,
+    Keyboard
   } from 'react-native';
 
   import Icon1 from 'react-native-vector-icons/Entypo';
@@ -27,15 +28,22 @@ import {
   import { CheckBox } from 'react-native-elements';
   import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
+  import AsyncStorage from '@react-native-async-storage/async-storage';
+  import AppLoader from '../component/loader';
+  import DropdownAlert from 'react-native-dropdownalert';
+  import ProviderServices from '../../api/providerservices';
+  import NetworkCheck from '../../utils/networkcheck';
+
 
 export default class Splash extends React.Component {
     constructor (props) {
       super(props);
       this.state = {
+          userdata:{},
           category:'',
           jobtitle:'',
           experience:'',
-          sallery:'',
+          salary:'',
           jobdesc:'',
           emptype:'',
           emprole:'',
@@ -43,10 +51,9 @@ export default class Splash extends React.Component {
           qualification:'',
           vacancy:'',
           location:'',
-          image:'',
-          imageURI:null,
+          imageOBJ:null,
           savechecked:false,
-          loading:false,
+          appLoading:false,
       };
 
       this.onBackButtonClick = this.onBackButtonClick.bind(this);
@@ -57,8 +64,15 @@ export default class Splash extends React.Component {
 
     }
 
-    componentDidMount(){}
+    componentDidMount(){
+        this.getUserData();   
+    }
 
+    async getUserData(){
+        var value = await AsyncStorage.getItem('User');
+        value = JSON.parse(value);
+        this.setState({userdata: value})
+    }
 
     onBackButtonClick(){
         this.props.navigation.goBack();
@@ -68,8 +82,114 @@ export default class Splash extends React.Component {
         
     }
 
-    onPostJobClick(){
-        this.props.navigation.navigate('HomeProvider');
+    async onPostJobClick(){
+
+        Keyboard.dismiss();
+
+        const isConnected = await NetworkCheck.isNetworkAvailable()
+
+        if (isConnected) {  
+
+        if(this.state.jobtitle.trim() == ''){
+            this.setState({jobtitle:''},()=>{this.jobtitleInputRef.focus(); })
+            this.dropDownAlertRef.alertWithType('error',"Job Title cannot be blank");
+          return
+        }
+        if(this.state.experience.trim() == ''){
+            this.setState({experience:''},()=>{this.experienceInputRef.focus(); })
+            this.dropDownAlertRef.alertWithType('error',"Experience cannot be blank");
+          return
+        }
+        if(this.state.salary.trim() == ''){
+            this.setState({salary:''},()=>{this.salaryInputRef.focus(); })
+            this.dropDownAlertRef.alertWithType('error',"Salary cannot be blank");
+          return
+        }
+        if(this.state.jobdesc.trim() == ''){
+            this.setState({jobdesc:''},()=>{this.jobdescriptionInputRef.focus(); })
+            this.dropDownAlertRef.alertWithType('error',"Job Description cannot be blank");
+          return
+        }
+        if(this.state.emprole.trim() == ''){
+            this.setState({emprole:''},()=>{this.emproleInputRef.focus(); })
+            this.dropDownAlertRef.alertWithType('error',"Employment Role cannot be blank");
+          return
+        }
+        if(this.state.empskill.trim() == ''){
+            this.setState({empskill:''},()=>{this.empskillsInputRef.focus(); })
+            this.dropDownAlertRef.alertWithType('error',"Employment Skills cannot be blank");
+          return
+        }
+        if(this.state.qualification.trim() == ''){
+            this.setState({qualification:''},()=>{this.qualificationInputRef.focus(); })
+            this.dropDownAlertRef.alertWithType('error',"Qualification cannot be blank");
+          return
+        }
+        if(this.state.vacancy.trim() == ''){
+            this.setState({vacancy:''},()=>{this.vacancyInputRef.focus(); })
+            this.dropDownAlertRef.alertWithType('error',"Vacancy cannot be blank");
+          return
+        }
+        if(this.state.location.trim() == ''){
+            this.setState({location:''},()=>{this.locationInputRef.focus(); })
+            this.dropDownAlertRef.alertWithType('error',"Location cannot be blank");
+          return
+        }
+        if(this.state.imageOBJ == null){
+            this.dropDownAlertRef.alertWithType('error',"Image cannot be blank");
+          return
+        }
+
+
+        let myFormData = new FormData();
+        myFormData.append("user_id",this.state.userdata._id)
+        myFormData.append("category",this.state.category)
+        myFormData.append("job_title", this.state.jobtitle)
+        myFormData.append("experience", this.state.experience)
+        myFormData.append("salary", this.state.salary)
+        myFormData.append("description", this.state.jobdesc)
+        myFormData.append("emp_type", this.state.emptype)
+        myFormData.append("emp_role", this.state.emprole)
+        myFormData.append("skills", this.state.empskill)
+        myFormData.append("qualification", this.state.qualification)
+        myFormData.append("vacancy", this.state.vacancy)
+        myFormData.append("location", this.state.location)
+        myFormData.append("images", {
+            name: "filedocument.png",
+            uri: this.state.imageOBJ.uri,
+            type: "*/*"
+        })
+        if(this.state.savechecked == false){myFormData.append("status",1)}
+        if(this.state.savechecked == true){myFormData.append("status",0)}
+
+        try {
+            this.setState({appLoading: true})
+            const { data } = await ProviderServices.ProviderPostJob(myFormData)
+            console.log(data);
+
+            if( data.status == 0 ){
+                this.setState({appLoading: false})
+                this.dropDownAlertRef.alertWithType('error', 'Something went wrong ...', "Try Again");
+            }
+
+            if( data.status == 1){
+                this.setState({appLoading: false})
+                this.dropDownAlertRef.alertWithType('success',"Job Created Successfully !");
+                this.props.navigation.goBack();
+            }
+
+            this.setState({appLoading: false})
+          }
+          catch(error){
+            console.log(error)
+            this.setState({appLoading: false})
+            console.log(error.data)
+            this.dropDownAlertRef.alertWithType('error', 'Failed', "Authentication Failed");
+          }
+        }
+        else{
+            this.dropDownAlertRef.alertWithType('error', 'No Internet Connection', "please check your device connection");
+        }
     }
 
     onChooseImageClick = () => {
@@ -86,13 +206,15 @@ export default class Splash extends React.Component {
         
               if (res.didCancel) {
                 console.log('User cancelled image picker');
+                this.setState({
+                    imageOBJ: null
+                  });
               } else if (res.error) {
                 console.log('ImagePicker Error: ', res.error);
               } else {
-                const source = { uri: res.uri };
                 console.log('response', JSON.stringify(res));
                 this.setState({
-                  imageURI: res.uri
+                  imageOBJ: res
                 });
               }
             });
@@ -145,11 +267,11 @@ export default class Splash extends React.Component {
                 dropdownIconColor={'#4F45F0'}
                 onValueChange={(category) => this.setState({category: category})}
             >
-               <Picker.Item label={'Grader'} value={'grader'} key={1}/>
-               <Picker.Item label={'Shiner'} value={'shiner'} key={2}/>
+               <Picker.Item label={'Grader'} value={'Grader'} key={1}/>
+               <Picker.Item label={'Shiner'} value={'Shiner'} key={2}/>
                <Picker.Item label={'4p'} value={'4p'} key={3}/>
-               <Picker.Item label={'Fancy'} value={'fancy'} key={4}/>
-               <Picker.Item label={'Office Staff'} value={'office staff'} key={5}/>
+               <Picker.Item label={'Fancy'} value={'Fancy'} key={4}/>
+               <Picker.Item label={'Office Staff'} value={'Office Staff'} key={5}/>
             </Picker>
             </View>
 
@@ -158,6 +280,10 @@ export default class Splash extends React.Component {
             </View>
             <View style={styles.iconInputContainer}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.jobtitleInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.experienceInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Job Title"
                 placeholderTextColor = "#0000005a"
@@ -171,26 +297,46 @@ export default class Splash extends React.Component {
             </View>
             <View style={styles.iconInputContainer}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.experienceInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { 
+                    this.salaryInputRef.focus();
+                    
+                    // if(this.state.experience){
+                    //     this.setState({experience:`${this.state.experience+' Years'}`})
+                    // }
+                }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Experience"
                 placeholderTextColor = "#0000005a"
                 autoCapitalize = "none"
+                keyboardType='number-pad'
                 value={this.state.experience}
                 onChangeText={(experience) => this.setState({experience})}  />
             </View>
 
             <View style={{marginHorizontal:20,marginTop:15}}>
-                <Text style={{fontSize:18}}>Sallery</Text>
+                <Text style={{fontSize:18}}>Salary</Text>
             </View>
             <View style={styles.iconInputContainer}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.salaryInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { 
+                    this.jobdescriptionInputRef.focus();
+                    // if(this.state.salary){
+                    //     this.setState({salary:`${this.state.salary+' INR'}`})
+                    // }
+                }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
-                placeholder = "Sallery"
+                placeholder = "Salary"
                 placeholderTextColor = "#0000005a"
                 autoCapitalize = "none"
                 keyboardType='number-pad'
-                value={this.state.sallery}
-                onChangeText={(sallery) => this.setState({sallery})}  />
+                value={this.state.salary}
+                onChangeText={(salary) => this.setState({salary})}  />
             </View>
 
             <View style={{marginHorizontal:20,marginTop:15}}>
@@ -198,6 +344,10 @@ export default class Splash extends React.Component {
             </View>
             <View style={styles.iconInputContainer}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.jobdescriptionInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.emproleInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Job Description"
                 placeholderTextColor = "#0000005a"
@@ -216,10 +366,12 @@ export default class Splash extends React.Component {
                 selectedValue={this.state.emptype}
                 enabled={true}
                 dropdownIconColor={'#4F45F0'}
-                onValueChange={(emptype) => this.setState({emptype: emptype})}
+                onValueChange={(emptype) => {
+                    this.setState({emptype: emptype})
+                }}
             >
-               <Picker.Item label={'Full Time'} value={'grader'} key={1}/>
-               <Picker.Item label={'Part Time'} value={'grader'} key={2}/>
+               <Picker.Item label={'Full Time'} value={'Full-Time'} key={1}/>
+               <Picker.Item label={'Part Time'} value={'Part-Time'} key={2}/>
             </Picker>
             </View>
 
@@ -229,6 +381,10 @@ export default class Splash extends React.Component {
             </View>
             <View style={styles.iconInputContainer}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.emproleInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.empskillsInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Employment Role"
                 placeholderTextColor = "#0000005a"
@@ -242,6 +398,10 @@ export default class Splash extends React.Component {
             </View>
             <View style={styles.iconInputContainer}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.empskillsInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.qualificationInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Employment Skills"
                 placeholderTextColor = "#0000005a"
@@ -255,6 +415,10 @@ export default class Splash extends React.Component {
             </View>
             <View style={styles.iconInputContainer}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.qualificationInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.vacancyInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Qualification"
                 placeholderTextColor = "#0000005a"
@@ -268,6 +432,12 @@ export default class Splash extends React.Component {
             </View>
             <View style={styles.iconInputContainer}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.vacancyInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { 
+                    this.locationInputRef.focus(); 
+                }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Vacancy"
                 placeholderTextColor = "#0000005a"
@@ -282,6 +452,8 @@ export default class Splash extends React.Component {
             </View>
             <View style={styles.iconInputContainer}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.locationInputRef = input }}
+                onSubmitEditing={() => { Keyboard.dismiss() }}
                 underlineColorAndroid = "transparent"
                 placeholder = "Location"
                 placeholderTextColor = "#0000005a"
@@ -293,7 +465,7 @@ export default class Splash extends React.Component {
             <TouchableOpacity onPress={this.onChooseImageClick}  style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:25,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
                 <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
                 {
-                    this.state.imageURI == null || this.state.imageURI == "" ?
+                    this.state.imageOBJ == null || this.state.imageOBJ.uri === "" ?
 
                     <Icon4 name="user" color={"#4F45F0"} size={26} />
                     :
@@ -301,7 +473,7 @@ export default class Splash extends React.Component {
                             width: 55,
                             height: 55,
                         }}
-                        source={{uri: `${this.state.imageURI}`}}/>
+                        source={{uri: `${this.state.imageOBJ.uri}`}}/>
                 }    
 
                 </View>
@@ -329,7 +501,8 @@ export default class Splash extends React.Component {
             </TouchableOpacity>
             </ImageBackground> 
             </KeyboardAwareScrollView>
-
+            <DropdownAlert inactiveStatusBarStyle="light-content" inactiveStatusBarBackgroundColor="#4F45F0" ref={ref => this.dropDownAlertRef = ref} />
+            <AppLoader isAppLoading={this.state.appLoading}/>
         </View>
       );
     }

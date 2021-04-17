@@ -10,7 +10,8 @@ import {
     Dimensions, 
     TouchableOpacity,
     ScrollView,
-    StatusBar
+    StatusBar,
+    Keyboard,
   } from 'react-native';
 
   import Icon1 from 'react-native-vector-icons/Entypo';
@@ -20,8 +21,16 @@ import {
   import Icon5 from 'react-native-vector-icons/AntDesign';
   import Icon6 from 'react-native-vector-icons/Ionicons';
   import Icon7 from 'react-native-vector-icons/EvilIcons';
+  import Icon8 from 'react-native-vector-icons/MaterialIcons';
 
   import { launchImageLibrary} from 'react-native-image-picker';
+
+  import AsyncStorage from '@react-native-async-storage/async-storage';
+  import AppLoader from '../component/loader';
+  import DropdownAlert from 'react-native-dropdownalert';
+  import moment from 'moment';
+  import ProviderServices from '../../api/providerservices';
+  import NetworkCheck from '../../utils/networkcheck';
 
 export default class Splash extends React.Component {
     constructor (props) {
@@ -40,9 +49,12 @@ export default class Splash extends React.Component {
           cwebsite:'',
           cemail:'',
           cmobile:'',
-          imageURI:null,
-
-          loading:false,
+          imageOBJ:null,
+          aadharOBJ:null,
+          panOBJ:null,
+          appLoading:false,
+          appFetchingLoader:false,
+          myCustomAlert:0,
       };
 
       this.onNotificationClick = this.onNotificationClick.bind(this);
@@ -79,6 +91,9 @@ export default class Splash extends React.Component {
           console.log('Response = ', res);
     
           if (res.didCancel) {
+            this.setState({
+                imageOBJ:null
+              });
             console.log('User cancelled image picker');
           } else if (res.error) {
             console.log('ImagePicker Error: ', res.error);
@@ -86,7 +101,36 @@ export default class Splash extends React.Component {
             const source = { uri: res.uri };
             console.log('response', JSON.stringify(res));
             this.setState({
-              imageURI: res.uri
+                imageOBJ:res
+            });
+          }
+        });
+    }
+
+    onAadharCardClick = () => {
+
+        let options = {
+          storageOptions: {
+            skipBackup: true,
+            path: 'images',
+          },
+        };
+    
+        launchImageLibrary(options, (res) => {
+          console.log('Response = ', res);
+    
+          if (res.didCancel) {
+            this.setState({
+                aadharOBJ:null
+              });
+            console.log('User cancelled image picker');
+          } else if (res.error) {
+            console.log('ImagePicker Error: ', res.error);
+          } else {
+            const source = { uri: res.uri };
+            console.log('response', JSON.stringify(res));
+            this.setState({
+                aadharOBJ:res
             });
           }
         });
@@ -138,16 +182,18 @@ export default class Splash extends React.Component {
                 alignItems: 'center',
                 top:95}}>
                 {
-                    this.state.imageURI == null || this.state.imageURI == "" ?
+                    this.state.imageOBJ == null || this.state.imageOBJ.uri === "" ?
                     <Image source={require('../../assets/image/dummy_avatar.png')} style={{height:150,width:150,borderRadius:75}} resizeMode='contain'></Image>
                     :
-                    <Image source={{uri: `${this.state.imageURI}`}} style={{height:150,width:150,borderRadius:150/2}} />
+                    <Image source={{uri: `${this.state.imageOBJ.uri}`}} style={{height:150,width:150,borderRadius:150/2}} />
                 }    
             </TouchableOpacity>
             </View>
 
-            <View style={{alignItems:'center',marginTop:115}}>
+            <View style={{alignItems:'center',alignSelf:"center",flexDirection:"row",marginTop:115}}>
                 <Text style={{fontSize:18}}>Softlion Infotech</Text>
+                <Icon8 name="verified" color={"#4F45F0"} size={26} style={{bottom:5,left:2}} />
+
             </View>
 
             <View style={{alignItems:'center',justifyContent:'space-between',flexDirection:'row',borderTopWidth:0.8,borderBottomWidth:0.8,marginHorizontal:20,marginTop:15}}>
@@ -351,6 +397,84 @@ export default class Splash extends React.Component {
                 onChangeText={(ctotalexperience) => this.setState({ctotalexperience})}  />
             </View>
 
+            <View style={{height:1,borderBottomWidth:1,marginTop:35,borderColor:"#0000003a"}}></View>
+
+            <View style={{marginHorizontal:20,marginTop:15,justifyContent:'space-between',flexDirection:'row'}}>
+                <Text style={{color:"#fff",alignSelf:'flex-start',backgroundColor:"#4F45F0",padding:5,borderRadius:5,fontSize:18}}>Know Your Customer</Text>
+            </View>
+            <View style={{height:1,borderBottomWidth:1,marginTop:15,borderColor:"#0000003a"}}></View>
+
+            <Text style={{color:"#0000005a",alignSelf:'center',marginTop:5,backgroundColor:"#4F45F01a",padding:5,borderRadius:5,fontSize:13}}>Upload the following documents to get verified user badge</Text>
+            {/* <View style={{marginHorizontal:20,marginTop:15}}>
+                <Text style={{fontSize:18}}>Aadhar Card</Text>
+            </View>
+            <View style={styles.iconInputContainer}>
+            <TextInput style = {styles.iconInputField}
+                underlineColorAndroid = "transparent"
+                placeholder = "Company Description"
+                placeholderTextColor = "#0000005a"
+                autoCapitalize = "none"
+                value={this.state.cjobexperience}
+                onChangeText={(cjobexperience) => this.setState({cjobexperience})}  />
+            </View> */}
+
+            <TouchableOpacity onPress={this.onAadharCardClick}  style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
+                <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
+                {
+                    this.state.aadharOBJ == null || this.state.aadharOBJ.uri === "" ?
+
+                    <Icon4 name="address-card" color={"#4F45F0"} size={26} />
+                    :
+                        <Image style={{
+                            width: 55,
+                            height: 55,
+                        }}
+                        source={{uri: `${this.state.aadharOBJ.uri}`}}/>
+                }    
+
+                </View>
+                <View style={{justifyContent:"space-between",alignItems:"center",paddingHorizontal:35}}></View>
+                <Text style={{fontSize:18,color:"#4F45F0"}}>Aadhar Card</Text>
+            </TouchableOpacity>
+
+            <View  style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
+                <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
+                {
+                    this.state.panOBJ == null || this.state.panOBJ.uri === "" ?
+
+                    <Icon4 name="clock" color={"#4F45F0"} size={26} />
+                    :
+                        <Image style={{
+                            width: 55,
+                            height: 55,
+                        }}
+                        source={{uri: `${this.state.panOBJ.uri}`}}/>
+                }    
+
+                </View>
+                <View style={{justifyContent:"space-between",alignItems:"center",paddingHorizontal:35}}></View>
+                <Text style={{fontSize:18,color:"#4F45F0"}}>Pan Card</Text>
+            </View>
+
+            <View  style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
+                <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
+                {
+                    this.state.panOBJ == null || this.state.panOBJ.uri === "" ?
+
+                    <Icon8 name="verified" color={"#4F45F0"} size={26} />
+                    :
+                        <Image style={{
+                            width: 55,
+                            height: 55,
+                        }}
+                        source={{uri: `${this.state.panOBJ.uri}`}}/>
+                }    
+
+                </View>
+                <View style={{justifyContent:"space-between",alignItems:"center",paddingHorizontal:35}}></View>
+                <Text style={{fontSize:18,color:"#4F45F0"}}>Pan Card</Text>
+            </View>
+
             <TouchableOpacity onPress={this.onUpdateProfileClick}  style={styles.loginButtonContainer}>
                 <Text style={styles.loginButtonText}>Update Profile</Text>
             </TouchableOpacity>
@@ -432,7 +556,7 @@ const styles = StyleSheet.create({
         alignItems:'center',
         backgroundColor:'#4F45F0',
         alignSelf:'center',
-        marginTop:35,
+        marginTop:45,
         height:55,
         width:Dimensions.get('window').width/2,
         borderRadius:7,

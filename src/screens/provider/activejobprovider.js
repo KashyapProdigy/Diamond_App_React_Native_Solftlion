@@ -22,75 +22,24 @@ import {
   import Icon7 from 'react-native-vector-icons/EvilIcons';
   import Icon8 from 'react-native-vector-icons/SimpleLineIcons';
 
+  import AsyncStorage from '@react-native-async-storage/async-storage';
+  import AppLoader from '../component/loader';
+  import DropdownAlert from 'react-native-dropdownalert';
+  import moment from 'moment';
+  import ProviderServices from '../../api/providerservices';
+  import NetworkCheck from '../../utils/networkcheck';
+
 export default class Splash extends React.Component {
     constructor (props) {
       super(props);
       this.state = {
-        renderjobs:[
-            {   
-                status:'Open',
-                description:'we provide full time jobs in grading diamonds',
-                date:'01-04-2021',
-                experience:'1-5 years',
-                location:'Surat,Gujarat',
-                company:'Shree Ram Krishna',
-                title:'Grader',
-                id:1
-            },
-            {   
-                status:'Closed',
-                description:'full time jobs in shining diamonds',
-                date:'03-05-2021',
-                experience:'1-5 years',
-                location:'Navsari,Gujarat',
-                company:'Pavan Impex',
-                title:'Shiner',
-                id: 2
-            },
-            {   
-                status:'Open',
-                description:'full time jobs in shining diamonds',
-                date:'03-05-2021',
-                experience:'1+ years',
-                location:'Mumbai',
-                company:'Agarwal Impex',
-                title:'Office Staff',
-                id: 3
-            },
-            {   
-                status:'Open',
-                description:'full time jobs in shining diamonds',
-                date:'03-05-2021',
-                experience:'1-5 years',
-                location:'Surat,Gujarat',
-                company:'Pavan Impex',
-                title:'FancyCutting',
-                id: 4
-            },
-            {   
-                status:'Closed',
-                description:'full time jobs in shining diamonds',
-                date:'03-05-2021',
-                experience:'1-5 years',
-                location:'Navsari,Gujarat',
-                company:'Pavan Impex',
-                title:'Shiner',
-                id: 5
-            },
-            {   
-                status:'Closed',
-                description:'full time jobs in shining diamonds',
-                date:'03-05-2021',
-                experience:'1-5 years',
-                location:'Navsari,Gujarat',
-                company:'Pavan Impex',
-                title:'4p Operator',
-                id: 6
-            },
-        ],
+          renderjobs:null,
+          userdata:{},
           toggleOptionsVisibility:false,
           toggleCardID:null,
-          loading:false,
+          appLoading:false,
+          appFetchingLoader:false,
+          myCustomAlert:0,
       };
 
       this.onFilterClick = this.onFilterClick.bind(this);
@@ -104,7 +53,85 @@ export default class Splash extends React.Component {
 
     }
 
-    componentDidMount(){}
+    componentDidMount(){
+        this.getUserData();
+        var that = this;
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            that.ProviderActivePostApiCall();
+          });
+    }
+
+    componentWillUnmount() {
+        this._unsubscribe();
+    }
+
+    async getUserData(){
+        var value = await AsyncStorage.getItem('User');
+        value = JSON.parse(value);
+        this.setState({userdata: value},()=>{
+            console.log(this.state.userdata)
+            this.ProviderActivePostApiCall();
+        })
+    }
+
+    async ProviderActivePostApiCall(){
+
+        const isConnected = await NetworkCheck.isNetworkAvailable()
+
+        if (isConnected) {  
+
+        this.setState({appFetchingLoader:true})
+
+        let myFormData = new FormData();
+        myFormData.append("user_id",this.state.userdata._id)
+        myFormData.append("status",1)
+
+        try {
+            const { data } = await ProviderServices.ProvideActivePosts(myFormData)
+            console.log(data);
+
+            if( data.status == 0 ){
+                this.setState({
+                    renderjobs:null,
+                    appFetchingLoader:false,
+                    appLoading:false
+                })
+            }
+
+            if( data.status == 1 ){
+                this.setState({
+                    renderjobs:data.data,
+                    appFetchingLoader:false,
+                    appLoading:false
+                })
+            }
+
+            if(this.state.myCustomAlert == 0){}
+            if(this.state.myCustomAlert == 1){
+                this.setState({myCustomAlert:0})
+                this.dropDownAlertRef.alertWithType('success', "Job Deactivated");
+            }
+            if(this.state.myCustomAlert == 2){
+                this.setState({myCustomAlert:0})
+                this.dropDownAlertRef.alertWithType('success', "Job Recruitment Closed");
+            }
+            if(this.state.myCustomAlert == 3){
+                this.setState({myCustomAlert:0})
+                this.dropDownAlertRef.alertWithType('success', "Job Deleted");
+            }
+
+          }
+          catch(error){
+            this.setState({appFetchingLoader:false})
+            console.log(error)
+            console.log(error.data)
+            this.dropDownAlertRef.alertWithType('error', 'Failed', "Authentication Failed");
+          }
+        }
+        else{
+            this.dropDownAlertRef.alertWithType('error', 'No Internet Connection', "please check your device connection");
+        }
+    }
 
     onFilterClick(){
         this.props.navigation.navigate('HomeProvider');
@@ -133,27 +160,27 @@ export default class Splash extends React.Component {
         }
     }
 
-    onDeactivatePostClick(){
+    onDeactivatePostClick(postid){
         this.setState({toggleCardID:null,toggleOptionsVisibility:false,})
         Alert.alert(
             'Deactivate Post',
             'want to deactivate this job post ?',
             [
               {text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-              {text: 'Yes', onPress: () =>  this.deactivateJobPost()},
+              {text: 'Yes', onPress: () =>  this.deactivateJobPost(postid)},
             ],
             {cancelable: false},
           );
     }
 
-    onDeletePostClick(){
+    onDeletePostClick(postid){
         this.setState({toggleCardID:null,toggleOptionsVisibility:false,})
         Alert.alert(
             'Delete Post',
             'want to delete this job post ?',
             [
               {text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-              {text: 'Yes', onPress: () =>  this.deleteJobPost()},
+              {text: 'Yes', onPress: () =>  this.deleteJobPost(postid)},
             ],
             {cancelable: false},
           );
@@ -163,28 +190,115 @@ export default class Splash extends React.Component {
         this.props.navigation.navigate('EmployeeApplied');
     }
 
-    onCloseRecruitmentClick(){
+    onCloseRecruitmentClick(postid){
         Alert.alert(
             'Close Recruitment',
             'want to close recruitment for this job ?',
             [
               {text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-              {text: 'Yes', onPress: () =>  this.closeRecruitment()},
+              {text: 'Yes', onPress: () =>  this.closeRecruitment(postid)},
             ],
             {cancelable: false},
           );
     }
 
-    deleteJobPost(){
-        this.props.navigation.navigate('AllJobProvider');
+    async deleteJobPost(postID){
+        const isConnected = await NetworkCheck.isNetworkAvailable()
+
+        if (isConnected) {  
+
+        this.setState({appLoading:true})
+
+        let myFormData = new FormData();
+        myFormData.append("_id",postID)
+        myFormData.append("status",3)
+
+        try {
+            const { data } = await ProviderServices.ProvideTogglePosts(myFormData)
+            console.log(data);
+
+            if( data.status == 3 ){
+                this.setState({myCustomAlert:3})
+            }
+            
+            this.ProviderActivePostApiCall();
+          }
+          catch(error){
+            this.setState({appLoading:false})
+            console.log(error)
+            console.log(error.data)
+            this.dropDownAlertRef.alertWithType('error', 'Failed', "Authentication Failed");
+          }
+        }
+        else{
+            this.dropDownAlertRef.alertWithType('error', 'No Internet Connection', "please check your device connection");
+        }
     }
 
-    deactivateJobPost(){
-        this.props.navigation.navigate('AllJobProvider');
+    async deactivateJobPost(postID){
+        const isConnected = await NetworkCheck.isNetworkAvailable()
+
+        if (isConnected) {  
+
+        this.setState({appLoading:true})
+
+        let myFormData = new FormData();
+        myFormData.append("_id",postID)
+        myFormData.append("status",2)
+
+        try {
+            const { data } = await ProviderServices.ProvideTogglePosts(myFormData)
+            console.log(data);
+
+            if( data.status == 2){
+                this.setState({myCustomAlert:1})
+            }
+            
+            this.ProviderActivePostApiCall();
+          }
+          catch(error){
+            this.setState({appLoading:false})
+            console.log(error)
+            console.log(error.data)
+            this.dropDownAlertRef.alertWithType('error', 'Failed', "Authentication Failed");
+          }
+        }
+        else{
+            this.dropDownAlertRef.alertWithType('error', 'No Internet Connection', "please check your device connection");
+        }
     }
 
-    closeRecruitment(){
-        this.props.navigation.navigate('AllJobProvider');
+    async closeRecruitment(postID){
+        const isConnected = await NetworkCheck.isNetworkAvailable()
+
+        if (isConnected) {  
+
+        this.setState({appLoading:true})
+
+        let myFormData = new FormData();
+        myFormData.append("_id",postID)
+        myFormData.append("status",0)
+
+        try {
+            const { data } = await ProviderServices.ProvideTogglePosts(myFormData)
+            console.log(data);
+
+            if( data.status == 0 ){
+                this.setState({myCustomAlert:2})
+            }
+            
+            this.ProviderActivePostApiCall();
+          }
+          catch(error){
+            this.setState({appLoading:false})
+            console.log(error)
+            console.log(error.data)
+            this.dropDownAlertRef.alertWithType('error', 'Failed', "Authentication Failed");
+          }
+        }
+        else{
+            this.dropDownAlertRef.alertWithType('error', 'No Internet Connection', "please check your device connection");
+        }
     }
 
     render () {
@@ -219,77 +333,91 @@ export default class Splash extends React.Component {
 
         </View>
         
-        <View style={{ flex:75 ,}}>
+        <View style={{ flex:92,}}>
 
-        <View style={{marginHorizontal:20}}>
-        <FlatList
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ paddingBottom: 170,paddingTop:10 }}
-                    data={this.state.renderjobs}
-                    keyExtractor={item => item.id}
-                    renderItem={({ item }) => 
-                        
-                        <View style={{borderRadius:15,borderWidth:0.5,marginTop:10,backgroundColor:'#0000000a'}}>
-                            <View style={{flexDirection:'row'}}>
-                                <View style={{marginVertical:10,marginLeft:20}}><Icon4 name="user" color={'#4F45F0'} size={48} /></View>
-                                <View style={{marginVertical:10,marginLeft:30,width:'60%'}}> 
-                                    <Text style={{fontSize:18,fontWeight:'bold'}}>{item.title}</Text>
-                                    <Text style={{marginTop:6}}>{item.company}</Text>
-                                </View >
-                                <View>
-                                <TouchableOpacity onPress={()=>this.onOptionClick(item.id)} 
-                                    style={{paddingVertical:10,paddingHorizontal:10}}>
-                                    <Icon8 name="options-vertical"color={'#4F45F0'} size={26} />
-                                </TouchableOpacity>
-                                {this.state.toggleOptionsVisibility && (this.state.toggleCardID == item.id) ?
-                                <View style={{backgroundColor:'#ffffff5a',right:15,top:55,justifyContent:'center',alignItems:'center',borderRadius:12,width:130,borderWidth:0.8,position:"absolute"}}>
-                                    <TouchableOpacity onPress={this.onDeactivatePostClick} style={{borderBottomWidth:0.8}}>
-                                    <Text style={{padding:10}}>Deactivate Post</Text>
+        {this.state.renderjobs == null ? 
+            
+                this.state.appFetchingLoader == true ? 
+                null 
+                :
+                <View style={{alignItems:"center",justifyContent:"center",flex:1}}>
+                    <Text style={{color:'#4F45F0',fontSize:22}}>No Active Jobs Found</Text>
+                </View>
+
+            :
+
+            <View style={{marginHorizontal:20}}>
+            <FlatList
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{ paddingBottom: 170,paddingTop:10 }}
+                        data={this.state.renderjobs}
+                        keyExtractor={item => item._id}
+                        renderItem={({ item }) => 
+                            
+                            <View style={{borderRadius:15,borderWidth:0.5,marginTop:20,backgroundColor:'#0000000a'}}>
+                                <View style={{flexDirection:'row'}}>
+                                    <View style={{marginVertical:10,marginLeft:20}}><Icon4 name="user" color={'#4F45F0'} size={48} /></View>
+                                    <View style={{marginVertical:10,marginLeft:30,width:'60%'}}> 
+                                        <Text style={{fontSize:18,fontWeight:'bold'}}>{item.category}</Text>
+                                        <Text style={{marginTop:6}}>{item.job_title}</Text>
+                                    </View >
+                                    <View>
+                                    <TouchableOpacity onPress={()=>this.onOptionClick(item._id)} 
+                                        style={{paddingVertical:10,paddingHorizontal:10}}>
+                                        <Icon8 name="options-vertical"color={'#4F45F0'} size={26} />
                                     </TouchableOpacity>
-                                    <TouchableOpacity onPress={this.onDeletePostClick} style={{padding:10}}>
-                                    <Text>Delete Post</Text>
+                                    {this.state.toggleOptionsVisibility && (this.state.toggleCardID == item._id) ?
+                                    <View style={{backgroundColor:'#ffffff5a',right:15,top:55,justifyContent:'center',alignItems:'center',borderRadius:12,width:130,borderWidth:0.8,position:"absolute"}}>
+                                        <TouchableOpacity onPress={()=>{this.onDeactivatePostClick(item._id)}} style={{borderBottomWidth:0.8}}>
+                                        <Text style={{padding:10}}>Deactivate Post</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={()=>{this.onDeletePostClick(item._id)}} style={{padding:10}}>
+                                        <Text>Delete Post</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    :null
+                                    }
+                                    </View>
+                                </View>
+    
+                                <View style={{flexDirection:'row',marginLeft:20,marginTop:20,alignItems:'center'}}>
+                                    <Icon7 name="location" color={'#000'} size={25} />
+                                    <Text style={{marginLeft:5}}>{item.location}</Text>
+                                </View>
+    
+                                <View style={{flexDirection:'row',marginLeft:20,marginTop:10,alignItems:'center'}}>
+                                    <Icon6 name="briefcase-outline" color={'#000'} size={20} />
+                                    <Text style={{marginLeft:10}}>experience   {item.experience} Years</Text>
+                                </View>
+    
+    
+                                <View style={{flexDirection:'row',marginLeft:20,marginTop:10,alignItems:'center'}}>
+                                    <Icon7 name="calendar" color={'#000'} size={25} />
+                                    <Text style={{marginLeft:5}}>posted   {moment(item.updated_at).format('Do MMMM,YYYY')}</Text>
+                                </View>
+    
+                                <View style={{flexDirection:'row',marginTop:25,alignItems:'center',paddingVertical:10,justifyContent:'space-between',backgroundColor:'#fff',borderRadius:15}}>
+                                    <TouchableOpacity onPress={this.onEmployeeAppliedClick} style={{flexDirection:'row',alignItems:'center'}}>
+                                    <Text style={{marginLeft:25,color:'#4F45F0',fontSize:15,fontWeight:"900"}}>Employee Applied (2)</Text>
                                     </TouchableOpacity>
+    
+                                    <View style={{width:1,borderWidth:0.5,height:30}}></View>
+    
+                                    <TouchableOpacity onPress={()=>{this.onCloseRecruitmentClick(item._id)}} style={{flexDirection:'row',alignItems:'center'}}>
+                                    <Text style={{marginRight:25,color:'#4F45F0',fontSize:15,fontWeight:"900"}}>Close Recruitment</Text>
+                                    </TouchableOpacity>
+                                    
                                 </View>
-                                :null
-                                }
-                                </View>
                             </View>
-
-                            <View style={{flexDirection:'row',marginLeft:20,marginTop:20,alignItems:'center'}}>
-                                <Icon7 name="location" color={'#000'} size={25} />
-                                <Text style={{marginLeft:5}}>{item.location}</Text>
-                            </View>
-
-                            <View style={{flexDirection:'row',marginLeft:20,marginTop:10,alignItems:'center'}}>
-                                <Icon6 name="briefcase-outline" color={'#000'} size={20} />
-                                <Text style={{marginLeft:10}}>experience {item.experience}</Text>
-                            </View>
-
-
-                            <View style={{flexDirection:'row',marginLeft:20,marginTop:10,alignItems:'center'}}>
-                                <Icon7 name="calendar" color={'#000'} size={25} />
-                                <Text style={{marginLeft:5}}>posted {item.date}</Text>
-                            </View>
-
-                            <View style={{flexDirection:'row',marginTop:25,alignItems:'center',paddingVertical:10,justifyContent:'space-between',backgroundColor:'#fff',borderRadius:15}}>
-                                <TouchableOpacity onPress={this.onEmployeeAppliedClick} style={{flexDirection:'row',alignItems:'center'}}>
-                                <Text style={{marginLeft:25,color:'#4F45F0',fontSize:15,fontWeight:"900"}}>Employee Applied (2)</Text>
-                                </TouchableOpacity>
-
-                                <View style={{width:1,borderWidth:0.5,height:30}}></View>
-
-                                <TouchableOpacity onPress={this.onCloseRecruitmentClick} style={{flexDirection:'row',alignItems:'center'}}>
-                                <Text style={{marginRight:25,color:'#4F45F0',fontSize:15,fontWeight:"900"}}>Close Recruitment</Text>
-                                </TouchableOpacity>
-                                
-                            </View>
-                        </View>
-                        }
-                />
-        </View>
+                            }
+                    />
+            </View>
+        }
 
         </View>
         </ImageBackground> 
+        <DropdownAlert inactiveStatusBarStyle="light-content" inactiveStatusBarBackgroundColor="#4F45F0" ref={ref => this.dropDownAlertRef = ref} />
+        <AppLoader isAppLoading={this.state.appLoading}/>
         </View>
       );
     }
@@ -306,7 +434,7 @@ const styles = StyleSheet.create({
         padding:15,
         marginHorizontal:10
       },
-      title: {
+      job_title: {
         fontSize: 18,
       },
     subcontainer1:{
@@ -398,3 +526,67 @@ const styles = StyleSheet.create({
 
 
 })
+
+
+           // [
+            //     {   
+            //         status:'Open',
+            //         description:'we provide full time jobs in grading diamonds',
+            //         updated_at:'01-04-2021',
+            //         experience:'1-5 years',
+            //         location:'Surat,Gujarat',
+            //         company:'Shree Ram Krishna',
+            //         job_title:'Grader',
+            //         _id:1
+            //     },
+            //     {   
+            //         status:'Closed',
+            //         description:'full time jobs in shining diamonds',
+            //         updated_at:'03-05-2021',
+            //         experience:'1-5 years',
+            //         location:'Navsari,Gujarat',
+            //         company:'Pavan Impex',
+            //         job_title:'Shiner',
+            //         _id: 2
+            //     },
+            //     {   
+            //         status:'Open',
+            //         description:'full time jobs in shining diamonds',
+            //         updated_at:'03-05-2021',
+            //         experience:'1+ years',
+            //         location:'Mumbai',
+            //         company:'Agarwal Impex',
+            //         job_title:'Office Staff',
+            //         _id: 3
+            //     },
+            //     {   
+            //         status:'Open',
+            //         description:'full time jobs in shining diamonds',
+            //         updated_at:'03-05-2021',
+            //         experience:'1-5 years',
+            //         location:'Surat,Gujarat',
+            //         company:'Pavan Impex',
+            //         job_title:'FancyCutting',
+            //         _id: 4
+            //     },
+            //     {   
+            //         status:'Closed',
+            //         description:'full time jobs in shining diamonds',
+            //         updated_at:'03-05-2021',
+            //         experience:'1-5 years',
+            //         location:'Navsari,Gujarat',
+            //         company:'Pavan Impex',
+            //         job_title:'Shiner',
+            //         _id: 5
+            //     },
+            //     {   
+            //         status:'Closed',
+            //         description:'full time jobs in shining diamonds',
+            //         updated_at:'03-05-2021',
+            //         experience:'1-5 years',
+            //         location:'Navsari,Gujarat',
+            //         company:'Pavan Impex',
+            //         job_title:'4p Operator',
+            //         _id: 6
+            //     },
+            // ]

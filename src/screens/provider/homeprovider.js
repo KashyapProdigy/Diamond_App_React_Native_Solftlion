@@ -26,14 +26,21 @@ import {
   import Icon9 from 'react-native-vector-icons/Fontisto';
 
   import AsyncStorage from '@react-native-async-storage/async-storage';
+  import AppLoader from '../component/loader';
+  import DropdownAlert from 'react-native-dropdownalert';
+  import ProviderServices from '../../api/providerservices';
+  import NetworkCheck from '../../utils/networkcheck';
 
 export default class Splash extends React.Component {
     constructor (props) {
       super(props);
       this.state = {
           userdata:{},
+          activeNumber:0,
+          appliedNumber:0,
+          totalNumber:0,
           togglePasswordVisibility:true,
-          loading:false,
+          appLoading:false,
       };
 
       this.onNotificationClick = this.onNotificationClick.bind(this);
@@ -47,12 +54,61 @@ export default class Splash extends React.Component {
 
     componentDidMount(){
         this.getUserData();
+        var that = this;
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            that.ProviderHomeApiCall();
+          });
+    }
+
+    componentWillUnmount() {
+        this._unsubscribe();
     }
 
     async getUserData(){
         var value = await AsyncStorage.getItem('User');
         value = JSON.parse(value);
-        this.setState({userdata: value},()=>{console.log(this.state.userdata)})
+        this.setState({userdata: value},()=>{
+            console.log(this.state.userdata)
+            this.ProviderHomeApiCall();
+        })
+    }
+
+    async ProviderHomeApiCall(){
+
+        const isConnected = await NetworkCheck.isNetworkAvailable()
+
+        if (isConnected) {  
+
+        let myFormData = new FormData();
+        myFormData.append("user_id",this.state.userdata._id)
+
+        try {
+            const { data } = await ProviderServices.ProviderHome(myFormData)
+            console.log(data);
+
+            if( data.status == 0 ){
+                this.dropDownAlertRef.alertWithType('error', 'Something went wrong ...');
+            }
+
+            if( data.status == 1){
+                this.setState({
+                    activeNumber: data.total_active,
+                    appliedNumber: data.totalpost_apply,
+                    totalNumber: data.totalpost
+                })
+            }
+
+          }
+          catch(error){
+            console.log(error)
+            this.setState({appLoading: false})
+            console.log(error.data)
+            this.dropDownAlertRef.alertWithType('error', 'Failed', "Authentication Failed");
+          }
+        }
+        else{
+            this.dropDownAlertRef.alertWithType('error', 'No Internet Connection', "please check your device connection");
+        }
     }
 
     onNotificationClick(){
@@ -120,7 +176,7 @@ export default class Splash extends React.Component {
                 </View>
                 <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:10}}>
                 <View style={{marginHorizontal:17}}><Text style={{color:'#4F45F0',fontSize:15}}>Active Post</Text></View>
-                <View style={{marginHorizontal:17}}><Text style={{color:'#4F45F0',fontSize:17}}>(0)</Text></View>
+                <View style={{marginHorizontal:17}}><Text style={{color:'#4F45F0',fontSize:17}}>({this.state.activeNumber})</Text></View>
                 </View>
             </TouchableOpacity>
 
@@ -130,7 +186,7 @@ export default class Splash extends React.Component {
                 </View>
                 <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:10}}>
                 <View style={{marginHorizontal:17}}><Text style={{color:'#4F45F0',fontSize:15}}>Today's{`\n`}Applied User</Text></View>
-                <View style={{marginHorizontal:17}}><Text style={{color:'#4F45F0',fontSize:17}}>(0)</Text></View>
+                <View style={{marginHorizontal:17}}><Text style={{color:'#4F45F0',fontSize:17}}>({this.state.appliedNumber})</Text></View>
                 </View>
             </TouchableOpacity>
         </View>
@@ -141,7 +197,7 @@ export default class Splash extends React.Component {
                 </View>
                 <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:10}}>
                 <View style={{marginHorizontal:17}}><Text style={{color:'#4F45F0',fontSize:15}}>Total Post</Text></View>
-                <View style={{marginHorizontal:17}}><Text style={{color:'#4F45F0',fontSize:17}}>(0)</Text></View>
+                <View style={{marginHorizontal:17}}><Text style={{color:'#4F45F0',fontSize:17}}>({this.state.totalNumber})</Text></View>
                 </View>
         </TouchableOpacity>
 
@@ -167,6 +223,8 @@ export default class Splash extends React.Component {
 
         </View>
         </ImageBackground> 
+        <DropdownAlert inactiveStatusBarStyle="light-content" inactiveStatusBarBackgroundColor="#4F45F0" ref={ref => this.dropDownAlertRef = ref} />
+        <AppLoader isAppLoading={this.state.appLoading}/>
         </View>
       );
     }

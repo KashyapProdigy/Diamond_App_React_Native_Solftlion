@@ -70,7 +70,7 @@ export default class Splash extends React.Component {
     async onLogoutCLick(){
         await AsyncStorage.removeItem('User');
         this.props.navigation.popToTop();
-        this.props.navigation.navigate("LandingPage");
+        this.props.navigation.replace("LandingPage");
     }
 
     render () {

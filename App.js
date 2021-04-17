@@ -27,6 +27,7 @@ import RateApp from './src/screens/common/rateapp';
  */
  import LoginSeeker from './src/screens/seeker/loginseeker';
  import RegisterSeeker from './src/screens/seeker/registerseeker';
+ import RegisterSkip from './src/screens/seeker/registerskip';
  import MainTabSeeker from './src/screens/seeker/maintabseeker';
  import ApplyForJobSeeker from './src/screens/seeker/applyforjobseeker';
  import SettingSeeker from './src/screens/seeker/settingseeker';
@@ -82,6 +83,7 @@ const App = () =>{
 
         <RootStack.Screen name="LoginSeeker" component={LoginSeeker} />
         <RootStack.Screen name="RegisterSeeker" component={RegisterSeeker} />
+        <RootStack.Screen name="RegisterSkip" component={RegisterSkip} />
         <RootStack.Screen name="MainTabSeeker" component={MainTabSeeker} />
         <RootStack.Screen name="ApplyForJobSeeker" component={ApplyForJobSeeker} />
         <RootStack.Screen name="SettingSeeker" component={SettingSeeker} />
