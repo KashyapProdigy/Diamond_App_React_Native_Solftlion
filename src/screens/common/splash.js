@@ -29,7 +29,6 @@ export default class Splash extends React.Component {
     async getUserData() {
         var value = await AsyncStorage.getItem('User');
         if (value == null){
-            this.props.navigation.popToTop();
             this.props.navigation.replace('LandingPage');
         } 
         else {

@@ -36,6 +36,9 @@ export default class Splash extends React.Component {
     constructor (props) {
       super(props);
       this.state = {
+          userdata:{},
+          totalpost:0,
+          totalactive:0,
           firstname:'',
           lastname:'',
           email:'',
@@ -45,13 +48,14 @@ export default class Splash extends React.Component {
           state:'',
           cname:'',
           cdesc:'',
-          cjobtitle:'',
           cwebsite:'',
           cemail:'',
-          cmobile:'',
           imageOBJ:null,
+          apiimageObJ:null,
           aadharOBJ:null,
-          panOBJ:null,
+          panOBJ:{uri:null},
+          aadhar_status:null,
+          pan_status:null,
           appLoading:false,
           appFetchingLoader:false,
           myCustomAlert:0,
@@ -63,7 +67,84 @@ export default class Splash extends React.Component {
 
     }
 
-    componentDidMount(){}
+    componentDidMount(){
+        var that = this;
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            that.getUserData();
+          });
+    }
+
+    componentWillUnmount() {
+        this._unsubscribe();
+    }
+
+    async getUserData(){
+        var value = await AsyncStorage.getItem('User');
+        value = JSON.parse(value);
+        this.setState({userdata: value},()=>{
+            console.log(this.state.userdata)
+            this.ProviderProfileApiCall();
+        })
+    }
+
+    async ProviderProfileApiCall(){
+
+        const isConnected = await NetworkCheck.isNetworkAvailable()
+
+        if (isConnected) {  
+
+        let myFormData = new FormData();
+        myFormData.append("user_id",this.state.userdata._id)
+
+        try {
+            const { data } = await ProviderServices.ProviderProfile(myFormData)
+            console.log(data);
+
+            if( data.status == 0 ){
+                this.dropDownAlertRef.alertWithType('error', 'Api Status = 0');
+            }
+
+            if( data.status == 1){
+                this.setState({
+                    totalpost:data.totalpost,
+                    totalactive:data.totalactive,
+                    firstname:data.data.firstname,
+                    lastname:data.data.lastname,
+                    email:data.data.email,
+                    mobile:data.data.mobile_no,
+                    address:data.data.address,
+                    city:data.data.city,
+                    state:data.data.state,
+                    cname:data.companay.company_name,
+                    cdesc:data.companay.description,
+                    cwebsite:data.companay.website,
+                    cemail:data.companay.email,
+                    imageOBJ:{uri:data.data.image},
+                    apiimageObJ:{uri:data.data.image},
+                    aadharOBJ:{uri:data.data.adhar_image_f},
+                    panOBJ:{uri:data.data.pan_image},
+                    aadhar_status:data.data.adhar_status,
+                    pan_status:data.data.pan_status,
+                    profile_edited:false,
+                    aadhar_edited:false,
+                    pan_edited:false
+                })
+            }
+
+            console.log("Aadhar Status === " , this.state.aadhar_status);
+            console.log("Pan Status === " , this.state.pan_status);
+          }
+          catch(error){
+            console.log(error)
+            this.setState({appLoading: false})
+            console.log(error.data)
+            this.dropDownAlertRef.alertWithType('error', 'Failed', "Authentication Failed");
+          }
+        }
+        else{
+            this.dropDownAlertRef.alertWithType('error', 'No Internet Connection', "please check your device connection");
+        }
+    }
 
 
     onNotificationClick(){
@@ -74,8 +155,78 @@ export default class Splash extends React.Component {
         this.props.navigation.navigate('SettingProvider');
     }
 
-    onUpdateProfileClick(){
-        this.props.navigation.navigate('ProfileProvider');
+    async onUpdateProfileClick(){
+        Keyboard.dismiss();
+
+        const isConnected = await NetworkCheck.isNetworkAvailable()
+
+        if (isConnected) {  
+
+        if(this.state.imageOBJ == null || this.state.imageOBJ.uri == null){
+            this.dropDownAlertRef.alertWithType('error',"Image cannot be blank");
+          return
+        }
+
+
+        let myFormData = new FormData();
+        myFormData.append("user_id",this.state.userdata._id)
+
+        myFormData.append("firstname",this.state.firstname)
+        myFormData.append("lastname",this.state.lastname)
+        myFormData.append("email",this.state.email)
+        myFormData.append("address",this.state.address)
+        myFormData.append("city",this.state.city)
+        myFormData.append("state",this.state.state)
+        myFormData.append("company_name",this.state.cname)
+        myFormData.append("description",this.state.cdesc)
+        myFormData.append("website",this.state.cwebsite)
+        myFormData.append("emailc",this.state.cemail)
+
+        // myFormData.append("pan_image",this.state.category)
+        // myFormData.append("adhar_image_f",this.state.category)
+        // myFormData.append("adhar_image_b",this.state.category)
+        // myFormData.append("langid",this.state.category)
+
+        myFormData.append("image", {
+            name: "filedocument.png",
+            uri: this.state.imageOBJ.uri,
+            type: "*/*"
+        })
+
+        myFormData.append("pan_image", {
+            name: "filedocument.png",
+            uri: this.state.panOBJ.uri,
+            type: "*/*"
+        })
+
+        try {
+            this.setState({appLoading: true})
+            const { data } = await ProviderServices.ProviderProfile(myFormData)
+            console.log(data);
+
+            if( data.status == 0 ){
+                this.setState({appFetchingLoader:false,appLoading:false})
+                this.dropDownAlertRef.alertWithType('error', 'Something went wrong ...', "Try Again");
+            }
+
+            if( data.status == 1){
+                this.setState({appFetchingLoader:false,appLoading:false})
+                this.dropDownAlertRef.alertWithType('success',"Profile Saved !");
+                this.ProviderProfileApiCall();
+            }
+
+            this.setState({appLoading: false})
+          }
+          catch(error){
+            console.log(error)
+            this.setState({appFetchingLoader:false,appLoading:false})
+            console.log(error.data)
+            this.dropDownAlertRef.alertWithType('error', 'Failed', "Authentication Failed");
+          }
+        }
+        else{
+            this.dropDownAlertRef.alertWithType('error', 'No Internet Connection', "please check your device connection");
+        }
     }
 
     onProfilePictureClick = () => {
@@ -92,7 +243,7 @@ export default class Splash extends React.Component {
     
           if (res.didCancel) {
             this.setState({
-                imageOBJ:null
+                imageOBJ:this.state.apiimageObJ
               });
             console.log('User cancelled image picker');
           } else if (res.error) {
@@ -131,6 +282,34 @@ export default class Splash extends React.Component {
             console.log('response', JSON.stringify(res));
             this.setState({
                 aadharOBJ:res
+            });
+          }
+        });
+    }
+
+    onPanCardClick = () => {
+
+        let options = {
+          storageOptions: {
+            skipBackup: true,
+            path: 'images',
+          },
+        };
+    
+        launchImageLibrary(options, (res) => {
+          console.log('Response = ', res);
+          if (res.didCancel) {
+            this.setState({
+                panOBJ:{uri:null}
+              });
+            console.log('User cancelled image picker');
+          } else if (res.error) {
+            console.log('ImagePicker Error: ', res.error);
+          } else {
+            const source = { uri: res.uri };
+            console.log('response', JSON.stringify(res));
+            this.setState({
+                panOBJ:res
             });
           }
         });
@@ -182,7 +361,7 @@ export default class Splash extends React.Component {
                 alignItems: 'center',
                 top:95}}>
                 {
-                    this.state.imageOBJ == null || this.state.imageOBJ.uri === "" ?
+                    this.state.imageOBJ == null || this.state.imageOBJ.uri === ""  || this.state.imageOBJ.uri == null ?
                     <Image source={require('../../assets/image/dummy_avatar.png')} style={{height:150,width:150,borderRadius:75}} resizeMode='contain'></Image>
                     :
                     <Image source={{uri: `${this.state.imageOBJ.uri}`}} style={{height:150,width:150,borderRadius:150/2}} />
@@ -191,20 +370,23 @@ export default class Splash extends React.Component {
             </View>
 
             <View style={{alignItems:'center',alignSelf:"center",flexDirection:"row",marginTop:115}}>
-                <Text style={{fontSize:18}}>Softlion Infotech</Text>
-                <Icon8 name="verified" color={"#4F45F0"} size={26} style={{bottom:5,left:2}} />
-
+                <Text style={{fontSize:18}}>{this.state.firstname}</Text>
+                {
+                    this.state.pan_status == 2 && this.state.aadhar_status == 2 ?
+                    <Icon8 name="verified" color={"#4F45F0"} size={26} style={{bottom:5,left:2}} />
+                    :null
+                }                
             </View>
 
             <View style={{alignItems:'center',justifyContent:'space-between',flexDirection:'row',borderTopWidth:0.8,borderBottomWidth:0.8,marginHorizontal:20,marginTop:15}}>
                 <View style={{justifyContent:"center",alignItems:"center",margin:15}}>
-                        <Text>Saved Job</Text>
-                        <Text style={{padding:4,backgroundColor:"#4F45F05a",marginTop:5,borderRadius:5}}>2</Text>
+                        <Text>Active Post</Text>
+                        <Text style={{padding:4,backgroundColor:"#4F45F05a",marginTop:5,borderRadius:5}}>{this.state.totalactive}</Text>
                 </View>
 
                 <View style={{justifyContent:"center",alignItems:"center",margin:15}}>
-                        <Text>Applied Job</Text>
-                        <Text style={{padding:4,backgroundColor:"#4F45F05a",marginTop:5,borderRadius:5}}>5</Text>
+                        <Text>Total Post</Text>
+                        <Text style={{padding:4,backgroundColor:"#4F45F05a",marginTop:5,borderRadius:5}}>{this.state.totalpost}</Text>
                 </View>
             </View>
 
@@ -217,6 +399,10 @@ export default class Splash extends React.Component {
             </View>
             <View style={styles.iconInputContainer}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.firstnameInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.lastnameInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "First Name"
                 placeholderTextColor = "#0000005a"
@@ -230,6 +416,10 @@ export default class Splash extends React.Component {
             </View>
             <View style={styles.iconInputContainer}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.lastnameInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.emailInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Last Name"
                 placeholderTextColor = "#0000005a"
@@ -243,6 +433,10 @@ export default class Splash extends React.Component {
             </View>
             <View style={styles.iconInputContainer}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.emailInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.addressInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Email ID"
                 placeholderTextColor = "#0000005a"
@@ -262,6 +456,7 @@ export default class Splash extends React.Component {
                 placeholderTextColor = "#0000005a"
                 autoCapitalize = "none"
                 keyboardType='phone-pad'
+                editable={false}
                 value={this.state.mobile}
                 onChangeText={(mobile) => this.setState({mobile})}  />
             </View>
@@ -271,6 +466,10 @@ export default class Splash extends React.Component {
             </View>
             <View style={styles.iconInputContainer}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.addressInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.cityInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Address"
                 placeholderTextColor = "#0000005a"
@@ -292,6 +491,10 @@ export default class Splash extends React.Component {
                     borderRadius:7,
                     }}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.cityInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.stateInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Current City"
                 placeholderTextColor = "#0000005a"
@@ -313,6 +516,10 @@ export default class Splash extends React.Component {
                     borderRadius:7,
                     }}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.stateInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.cnameInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Current State"
                 placeholderTextColor = "#0000005a"
@@ -336,6 +543,10 @@ export default class Splash extends React.Component {
             </View>
             <View style={styles.iconInputContainer}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.cnameInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.cdescInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Company Name"
                 placeholderTextColor = "#0000005a"
@@ -349,6 +560,10 @@ export default class Splash extends React.Component {
             </View>
             <View style={styles.iconInputContainer}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.cdescInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.cwebsiteInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Company Description"
                 placeholderTextColor = "#0000005a"
@@ -362,12 +577,16 @@ export default class Splash extends React.Component {
             </View>
             <View style={styles.iconInputContainer}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.cwebsiteInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { this.cemailInputRef.focus(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Company Website"
                 placeholderTextColor = "#0000005a"
                 autoCapitalize = "none"
-                value={this.state.cjobtitle}
-                onChangeText={(cjobtitle) => this.setState({cjobtitle})}  />
+                value={this.state.cwebsite}
+                onChangeText={(cwebsite) => this.setState({cwebsite})}  />
             </View>
 
             <View style={{marginHorizontal:20,marginTop:15}}>
@@ -375,105 +594,128 @@ export default class Splash extends React.Component {
             </View>
             <View style={styles.iconInputContainer}>
             <TextInput style = {styles.iconInputField}
+                ref={(input) => { this.cemailInputRef = input }}
+                returnKeyType="next"
+                onSubmitEditing={() => { Keyboard.dismiss(); }}
+                blurOnSubmit={false}
                 underlineColorAndroid = "transparent"
                 placeholder = "Company Email"
                 placeholderTextColor = "#0000005a"
                 autoCapitalize = "none"
-                value={this.state.clastjobexperience}
-                onChangeText={(clastjobexperience) => this.setState({clastjobexperience})}  />
+                value={this.state.cemail}
+                onChangeText={(cemail) => this.setState({cemail})}  />
             </View>
+            {
+                this.state.pan_status==2 && this.state.aadhar_status==2 ? null :
+                <View>
+                                    <View style={{height:1,borderBottomWidth:1,marginTop:35,borderColor:"#0000003a"}}></View>
+
+                                    <View style={{marginHorizontal:20,marginTop:15,justifyContent:'space-between',flexDirection:'row'}}>
+                                        <Text style={{color:"#fff",alignSelf:'flex-start',backgroundColor:"#4F45F0",padding:5,borderRadius:5,fontSize:18}}>Know Your Customer</Text>
+                                    </View>
+                                    <View style={{height:1,borderBottomWidth:1,marginTop:15,borderColor:"#0000003a"}}></View>
+
+                                    <Text style={{color:"#0000005a",alignSelf:'center',marginTop:5,backgroundColor:"#4F45F01a",padding:5,borderRadius:5,fontSize:13}}>Upload the following documents to get verified user badge</Text>
 
 
-            <View style={{marginHorizontal:20,marginTop:15}}>
-                <Text style={{fontSize:18}}>Number</Text>
-            </View>
-            <View style={styles.iconInputContainer}>
-            <TextInput style = {styles.iconInputField}
-                underlineColorAndroid = "transparent"
-                placeholder = "Company Contact Number"
-                placeholderTextColor = "#0000005a"
-                autoCapitalize = "none"
-                value={this.state.ctotalexperience}
-                onChangeText={(ctotalexperience) => this.setState({ctotalexperience})}  />
-            </View>
+                                    {
+                                        this.state.pan_status == 0 && (this.state.panOBJ.uri == null || this.state.panOBJ.uri == 'null' )?
+                                        <TouchableOpacity onPress={this.onPanCardClick} style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
+                                        <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
+                                        <Icon4 name="address-card" color={"#4F45F0"} size={26} />
+                                        </View>
+                                        <View style={{alignSelf:"center",flex:1,justifyContent:"center"}}>
+                                        <Text style={{fontSize:18,color:"#4F45F0",paddingHorizontal:50}}>Pan Card</Text>
+                                        </View>
+                                        </TouchableOpacity>
+                                        :null
+                                    }
 
-            <View style={{height:1,borderBottomWidth:1,marginTop:35,borderColor:"#0000003a"}}></View>
+                                    {
+                                        this.state.pan_status == 0 && this.state.panOBJ.uri != null ?
+                                        <TouchableOpacity onPress={this.onPanCardClick} style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
+                                        <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
+                                        <Image style={{
+                                                    width: 55,
+                                                    height: 55,
+                                                }}
+                                                source={{uri: `${this.state.panOBJ.uri}`}}/>  
+                                        </View>
+                                        <View style={{alignSelf:"center",flex:1,justifyContent:"center"}}>
+                                        <Text style={{fontSize:18,color:"#4F45F0",paddingHorizontal:50}}>Pan Card</Text>
+                                        </View>
 
-            <View style={{marginHorizontal:20,marginTop:15,justifyContent:'space-between',flexDirection:'row'}}>
-                <Text style={{color:"#fff",alignSelf:'flex-start',backgroundColor:"#4F45F0",padding:5,borderRadius:5,fontSize:18}}>Know Your Customer</Text>
-            </View>
-            <View style={{height:1,borderBottomWidth:1,marginTop:15,borderColor:"#0000003a"}}></View>
+                                        </TouchableOpacity>
+                                        :null
+                                    }
 
-            <Text style={{color:"#0000005a",alignSelf:'center',marginTop:5,backgroundColor:"#4F45F01a",padding:5,borderRadius:5,fontSize:13}}>Upload the following documents to get verified user badge</Text>
-            {/* <View style={{marginHorizontal:20,marginTop:15}}>
-                <Text style={{fontSize:18}}>Aadhar Card</Text>
-            </View>
-            <View style={styles.iconInputContainer}>
-            <TextInput style = {styles.iconInputField}
-                underlineColorAndroid = "transparent"
-                placeholder = "Company Description"
-                placeholderTextColor = "#0000005a"
-                autoCapitalize = "none"
-                value={this.state.cjobexperience}
-                onChangeText={(cjobexperience) => this.setState({cjobexperience})}  />
-            </View> */}
+                                    {
+                                        this.state.pan_status == 1 ?
+                                        <View style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
+                                        <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
+                                        <Icon4 name="clock" color={"#4F45F0"} size={26} />  
+                                        </View>
+                                        <View style={{alignSelf:"center",flex:1,justifyContent:"center"}}>
+                                        <Text style={{fontSize:18,color:"#4F45F0",paddingHorizontal:50}}>Pan Card</Text>
+                                        <Text style={{fontSize:12,color:"#4F45F0",paddingHorizontal:50}}>Approval Pending</Text>
+                                        </View>
 
-            <TouchableOpacity onPress={this.onAadharCardClick}  style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
-                <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
-                {
-                    this.state.aadharOBJ == null || this.state.aadharOBJ.uri === "" ?
+                                        </View>
+                                        :null
+                                    }
 
-                    <Icon4 name="address-card" color={"#4F45F0"} size={26} />
-                    :
-                        <Image style={{
-                            width: 55,
-                            height: 55,
-                        }}
-                        source={{uri: `${this.state.aadharOBJ.uri}`}}/>
-                }    
+                                    {
+                                        this.state.pan_status == 2 ?
+                                        <View style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
+                                        <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
+                                        <Icon8 name="verified" color={"#4F45F0"} size={26} />  
+                                        </View>
+                                        <View style={{alignSelf:"center",flex:1,justifyContent:"center"}}>
+                                        <Text style={{fontSize:18,color:"#4F45F0",paddingHorizontal:50}}>Pan Card</Text>
+                                        <Text style={{fontSize:12,color:"#4F45F0",paddingHorizontal:50}}>Approved</Text>
+                                        </View>
+
+                                        </View>
+                                        :null
+                                    }
+
+                                    {
+                                        this.state.pan_status == 3 && (this.state.panOBJ.uri == null || this.state.panOBJ.uri == 'null' )?
+                                        <TouchableOpacity onPress={this.onPanCardClick} style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
+                                        <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
+                                        <Icon8 name="do-not-disturb" color={"#4F45F0"} size={26} />  
+                                        </View>
+                                        <View style={{alignSelf:"center",flex:1,justifyContent:"center"}}>
+                                        <Text style={{fontSize:18,color:"#4F45F0",paddingHorizontal:50}}>Pan Card</Text>
+                                        <Text style={{fontSize:12,color:"#4F45F0",paddingHorizontal:50}}>Rejected</Text>
+                                        </View>
+                                        </TouchableOpacity>
+                                        :null
+                                    }
+
+                                    {
+                                        this.state.pan_status == 3 && this.state.panOBJ.uri != null ?
+                                        <TouchableOpacity onPress={this.onPanCardClick} style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
+                                        <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
+                                        <Image style={{
+                                                    width: 55,
+                                                    height: 55,
+                                                }}
+                                                source={{uri: `${this.state.panOBJ.uri}`}}/>  
+                                        </View>
+                                        <View style={{alignSelf:"center",flex:1,justifyContent:"center"}}>
+                                        <Text style={{fontSize:18,color:"#4F45F0",paddingHorizontal:50}}>Pan Card</Text>
+                                        <Text style={{fontSize:12,color:"#4F45F0",paddingHorizontal:50}}>Rejected</Text>
+                                        </View>
+
+                                        </TouchableOpacity>
+                                        :null
+                                    }
 
                 </View>
-                <View style={{justifyContent:"space-between",alignItems:"center",paddingHorizontal:35}}></View>
-                <Text style={{fontSize:18,color:"#4F45F0"}}>Aadhar Card</Text>
-            </TouchableOpacity>
+            }
+ 
 
-            <View  style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
-                <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
-                {
-                    this.state.panOBJ == null || this.state.panOBJ.uri === "" ?
-
-                    <Icon4 name="clock" color={"#4F45F0"} size={26} />
-                    :
-                        <Image style={{
-                            width: 55,
-                            height: 55,
-                        }}
-                        source={{uri: `${this.state.panOBJ.uri}`}}/>
-                }    
-
-                </View>
-                <View style={{justifyContent:"space-between",alignItems:"center",paddingHorizontal:35}}></View>
-                <Text style={{fontSize:18,color:"#4F45F0"}}>Pan Card</Text>
-            </View>
-
-            <View  style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
-                <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
-                {
-                    this.state.panOBJ == null || this.state.panOBJ.uri === "" ?
-
-                    <Icon8 name="verified" color={"#4F45F0"} size={26} />
-                    :
-                        <Image style={{
-                            width: 55,
-                            height: 55,
-                        }}
-                        source={{uri: `${this.state.panOBJ.uri}`}}/>
-                }    
-
-                </View>
-                <View style={{justifyContent:"space-between",alignItems:"center",paddingHorizontal:35}}></View>
-                <Text style={{fontSize:18,color:"#4F45F0"}}>Pan Card</Text>
-            </View>
 
             <TouchableOpacity onPress={this.onUpdateProfileClick}  style={styles.loginButtonContainer}>
                 <Text style={styles.loginButtonText}>Update Profile</Text>
@@ -482,6 +724,8 @@ export default class Splash extends React.Component {
             </ScrollView>
         </View>
         </ImageBackground> 
+        <DropdownAlert inactiveStatusBarStyle="light-content" inactiveStatusBarBackgroundColor="#4F45F0" ref={ref => this.dropDownAlertRef = ref} />
+        <AppLoader isAppLoading={this.state.appLoading}/>
         </View>
       );
     }
@@ -556,7 +800,7 @@ const styles = StyleSheet.create({
         alignItems:'center',
         backgroundColor:'#4F45F0',
         alignSelf:'center',
-        marginTop:45,
+        marginTop:55,
         height:55,
         width:Dimensions.get('window').width/2,
         borderRadius:7,

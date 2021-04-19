@@ -182,36 +182,6 @@ export default class Splash extends React.Component {
             </Picker>
             </View>
 
-            <View style={{flexDirection:'row', justifyContent:"space-around",marginTop:25}}>
-            <View style={{alignItems:"center",justifyContent:"center" , backgroundColor:"#4F45F01a",borderRadius:10}}>
-            <CheckBox
-            title='3X OR VG-GOOD'
-            checkedIcon='dot-circle-o'
-            uncheckedIcon='circle-o'
-            uncheckedColor={'#4F45F05a'}
-            checkedColor={'#4F45F0'}
-            textStyle={{color:"black",fontWeight:"300",fontStyle:'normal',fontSize:15}}
-            checked={this.state.savechecked}
-            containerStyle={{backgroundColor:"transparent",borderWidth:0,marginHorizontal:20}}
-            onPress={this.onSaveCheckBoxToggle} 
-            />
-            </View>
-
-            <View style={{alignItems:"center",justifyContent:"center",backgroundColor:"#4F45F01a",borderRadius:10}}>
-            <CheckBox
-            title='GIA OR nonGIA'
-            checkedIcon='dot-circle-o'
-            uncheckedIcon='circle-o'
-            uncheckedColor={'#4F45F05a'}
-            checkedColor={'#4F45F0'}
-            textStyle={{color:"black",fontWeight:"300",fontStyle:'normal',fontSize:15}}
-            checked={this.state.savechecked}
-            containerStyle={{backgroundColor:"transparent",borderWidth:0,marginHorizontal:20}}
-            onPress={this.onSaveCheckBoxToggle} 
-            />
-            </View>
-
-            </View>
             <View style={{marginHorizontal:20,marginTop:15}}>
                 <Text style={{fontSize:18}}>Shape & Color</Text> 
             </View>
@@ -230,6 +200,36 @@ export default class Splash extends React.Component {
                <Picker.Item label={'Fancy'} value={'Fancy'} key={4}/>
                <Picker.Item label={'Office Staff'} value={'Office Staff'} key={5}/>
             </Picker>
+            </View>
+
+            <View style={{flexDirection:'row', justifyContent:"space-between",marginTop:25,marginHorizontal:20}}>
+            <View style={{alignItems:"center",justifyContent:"center" , backgroundColor:"#4F45F01a",borderRadius:10}}>
+            <CheckBox
+            title='3X OR VG-GOOD'
+            checkedIcon='dot-circle-o'
+            uncheckedIcon='circle-o'
+            uncheckedColor={'#4F45F05a'}
+            checkedColor={'#4F45F0'}
+            textStyle={{color:"black",fontWeight:"300",fontStyle:'normal',fontSize:12}}
+            checked={this.state.savechecked}
+            containerStyle={{backgroundColor:"transparent",width:150,height:45}}
+            onPress={this.onSaveCheckBoxToggle} 
+            />
+            </View>
+
+            <View style={{alignItems:"center",justifyContent:"center",backgroundColor:"#4F45F01a",borderRadius:10}}>
+            <CheckBox
+            title='GIA OR nonGIA'
+            checkedIcon='dot-circle-o'
+            uncheckedIcon='circle-o'
+            uncheckedColor={'#4F45F05a'}
+            checkedColor={'#4F45F0'}
+            textStyle={{color:"black",fontWeight:"300",fontStyle:'normal',fontSize:12}}
+            checked={this.state.savechecked}
+            containerStyle={{backgroundColor:"transparent",borderWidth:0,marginHorizontal:20}}
+            onPress={this.onSaveCheckBoxToggle} 
+            />
+            </View>
             </View>
 
             <TouchableOpacity onPress={this.onSubmitClick}  style={styles.loginButtonContainer}>

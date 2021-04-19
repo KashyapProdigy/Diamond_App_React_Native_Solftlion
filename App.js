@@ -27,6 +27,7 @@ import RateApp from './src/screens/common/rateapp';
  */
  import LoginSeeker from './src/screens/seeker/loginseeker';
  import RegisterSeeker from './src/screens/seeker/registerseeker';
+ import OtpSeeker from './src/screens/seeker/otpverify';
  import RegisterSkip from './src/screens/seeker/registerskip';
  import MainTabSeeker from './src/screens/seeker/maintabseeker';
  import ApplyForJobSeeker from './src/screens/seeker/applyforjobseeker';
@@ -37,6 +38,7 @@ import RateApp from './src/screens/common/rateapp';
  */
   import LoginProvider from './src/screens/provider/loginprovider';
   import RegisterProvider from './src/screens/provider/registerprovider';
+  import OtpProvider from './src/screens/provider/otpverify';
   import MainTabProvider from './src/screens/provider/maintabprovider';
   import SettingProvider from './src/screens/provider/settingprovider';
   import CreateJobProvider from './src/screens/provider/createjobprovider';
@@ -47,6 +49,7 @@ import RateApp from './src/screens/common/rateapp';
 */
 import LoginSeller from './src/screens/seller/loginseller';
 import RegisterSeller from './src/screens/seller/registerseller';
+import OtpSeller from './src/screens/seller/otpverify';
 import MainTabSeller from './src/screens/seller/maintabseller';
 import FeaturedSeller from './src/screens/seller/featuredseller';
 import BestSellSeller from './src/screens/seller/bestsellseller';
@@ -83,6 +86,7 @@ const App = () =>{
 
         <RootStack.Screen name="LoginSeeker" component={LoginSeeker} />
         <RootStack.Screen name="RegisterSeeker" component={RegisterSeeker} />
+        <RootStack.Screen name="OtpSeeker" component={OtpSeeker} />
         <RootStack.Screen name="RegisterSkip" component={RegisterSkip} />
         <RootStack.Screen name="MainTabSeeker" component={MainTabSeeker} />
         <RootStack.Screen name="ApplyForJobSeeker" component={ApplyForJobSeeker} />
@@ -91,6 +95,7 @@ const App = () =>{
 
         <RootStack.Screen name="LoginProvider" component={LoginProvider} />
         <RootStack.Screen name="RegisterProvider" component={RegisterProvider} />
+        <RootStack.Screen name="OtpProvider" component={OtpProvider} />
         <RootStack.Screen name="MainTabProvider" component={MainTabProvider} />
         <RootStack.Screen name="SettingProvider" component={SettingProvider} />
         <RootStack.Screen name="CreateJobProvider" component={CreateJobProvider} />
@@ -99,6 +104,7 @@ const App = () =>{
 
         <RootStack.Screen name="LoginSeller" component={LoginSeller} />
         <RootStack.Screen name="RegisterSeller" component={RegisterSeller} />
+        <RootStack.Screen name="OtpSeller" component={OtpSeller} />
         <RootStack.Screen name="MainTabSeller" component={MainTabSeller} />
         <RootStack.Screen name="FeaturedSeller" component={FeaturedSeller} />
         <RootStack.Screen name="BestSellSeller" component={BestSellSeller} />

@@ -15,5 +15,6 @@ export const PROVIDER_HOME = BASE_URL + "providerhome";
 export const POST_JOB = BASE_URL + "postjob";
 export const TOTAL_POST = BASE_URL + "totalpost";
 export const TOGGLE_POST_STATUS = BASE_URL + "postactivedeactive";
+export const PROVIDER_PROFILE = BASE_URL + "providerupdate";
 
 //Seller Routes

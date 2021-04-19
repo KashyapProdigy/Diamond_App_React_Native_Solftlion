@@ -3,7 +3,8 @@ import
   PROVIDER_HOME,
   POST_JOB,
   TOTAL_POST,
-  TOGGLE_POST_STATUS
+  TOGGLE_POST_STATUS,
+  PROVIDER_PROFILE,
 } from "../utils/apiconstants";
 
 import axios from 'axios'
@@ -21,6 +22,19 @@ const ProviderServices = {
     console.log(body);
     console.log(`${PROVIDER_HOME}`);
     const data = await axios.post(`${PROVIDER_HOME}`, body, config);
+    return data;
+  },
+  ProviderProfile: async (bodyFormData) => {
+    const config = {
+      headers: {
+          'Content-Type': `multipart/form-data`,
+          'Authorization': `Basic YWRtaW46MTIz` 
+      },
+    };
+    const body = bodyFormData;
+    console.log(body);
+    console.log(`${PROVIDER_PROFILE}`);
+    const data = await axios.post(`${PROVIDER_PROFILE}`, body, config);
     return data;
   },
   ProviderPostJob: async (bodyFormData) => {

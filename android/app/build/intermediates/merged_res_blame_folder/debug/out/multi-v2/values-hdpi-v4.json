@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "/Users/kashyapkarkar/Desktop/Diamond_App_React_Native_Solftlion/android/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-hdpi-v4/values-hdpi-v4.xml",
+            "outputFile": "C:\\Users\\admin\\Desktop\\Diamond_App_React_Native_Solftlion\\android\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-hdpi-v4\\values-hdpi-v4.xml",
             "map": [
                 {
-                    "source": "/Users/kashyapkarkar/.gradle/caches/transforms-2/files-2.1/2d9554c962b1abf6ae5323af0c6305df/appcompat-1.1.0/res/values-hdpi-v4/values-hdpi-v4.xml",
+                    "source": "C:\\Users\\admin\\.gradle\\caches\\transforms-2\\files-2.1\\2d9554c962b1abf6ae5323af0c6305df\\appcompat-1.1.0\\res\\values-hdpi-v4\\values-hdpi-v4.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

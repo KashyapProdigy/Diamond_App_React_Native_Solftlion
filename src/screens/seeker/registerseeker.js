@@ -134,7 +134,7 @@ export default class Splash extends React.Component {
                 this.setState({appLoading: false})
                 await AsyncStorage.setItem('User',JSON.stringify(data.userdata[0]));
                 this.dropDownAlertRef.alertWithType('success',"Registered Successfully !");
-                this.props.navigation.replace('RegisterSkip');
+                this.props.navigation.replace('OtpSeeker');
             }
 
             this.setState({appLoading: false})
@@ -243,7 +243,9 @@ export default class Splash extends React.Component {
                 onChangeText={(password) => this.setState({password})}  />
             </View>
 
-            <TouchableOpacity onPress={this.onRegisterClick}  style={styles.loginButtonContainer}>
+            <TouchableOpacity onPress={()=>{
+                this.onRegisterClick();
+            }}  style={styles.loginButtonContainer}>
                 <Text style={styles.loginButtonText}>Register</Text>
             </TouchableOpacity>
 
