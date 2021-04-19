@@ -12,6 +12,7 @@ import {
     ScrollView,
     StatusBar,
     Keyboard,
+    Alert
   } from 'react-native';
 
   import Icon1 from 'react-native-vector-icons/Entypo';
@@ -24,6 +25,7 @@ import {
   import Icon8 from 'react-native-vector-icons/MaterialIcons';
 
   import { launchImageLibrary} from 'react-native-image-picker';
+  import ImagePicker from 'react-native-image-crop-picker';
 
   import AsyncStorage from '@react-native-async-storage/async-storage';
   import AppLoader from '../component/loader';
@@ -52,8 +54,10 @@ export default class Splash extends React.Component {
           cemail:'',
           imageOBJ:null,
           apiimageObJ:null,
-          aadharOBJ:null,
+          adharOBJ:[{uri:null},{uri:null}],
+          apiadharOBJ:null,
           panOBJ:{uri:null},
+          apipanObJ:null,
           aadhar_status:null,
           pan_status:null,
           appLoading:false,
@@ -63,7 +67,7 @@ export default class Splash extends React.Component {
 
       this.onNotificationClick = this.onNotificationClick.bind(this);
       this.onSettingClick = this.onSettingClick.bind(this);
-      this.onUpdateProfileClick = this.onUpdateProfileClick.bind(this);
+      this.onSaveProfileClick = this.onSaveProfileClick.bind(this);
 
     }
 
@@ -121,8 +125,10 @@ export default class Splash extends React.Component {
                     cemail:data.companay.email,
                     imageOBJ:{uri:data.data.image},
                     apiimageObJ:{uri:data.data.image},
-                    aadharOBJ:{uri:data.data.adhar_image_f},
+                    adharOBJ:[{uri:data.data.adhar_image_f},{uri:data.data.adhar_image_b}],
                     panOBJ:{uri:data.data.pan_image},
+                    apipanObJ:{uri:data.data.pan_image},
+                    apiadharOBJ:[{uri:data.data.adhar_image_f},{uri:data.data.adhar_image_b}],
                     aadhar_status:data.data.adhar_status,
                     pan_status:data.data.pan_status,
                     profile_edited:false,
@@ -131,8 +137,6 @@ export default class Splash extends React.Component {
                 })
             }
 
-            console.log("Aadhar Status === " , this.state.aadhar_status);
-            console.log("Pan Status === " , this.state.pan_status);
           }
           catch(error){
             console.log(error)
@@ -155,7 +159,7 @@ export default class Splash extends React.Component {
         this.props.navigation.navigate('SettingProvider');
     }
 
-    async onUpdateProfileClick(){
+    async onSaveProfileClick(){
         Keyboard.dismiss();
 
         const isConnected = await NetworkCheck.isNetworkAvailable()
@@ -182,22 +186,38 @@ export default class Splash extends React.Component {
         myFormData.append("website",this.state.cwebsite)
         myFormData.append("emailc",this.state.cemail)
 
-        // myFormData.append("pan_image",this.state.category)
-        // myFormData.append("adhar_image_f",this.state.category)
-        // myFormData.append("adhar_image_b",this.state.category)
         // myFormData.append("langid",this.state.category)
 
-        myFormData.append("image", {
-            name: "filedocument.png",
-            uri: this.state.imageOBJ.uri,
-            type: "*/*"
-        })
+        if(this.state.apiimageObJ != this.state.imageOBJ){
+            myFormData.append("image", {
+                name: "filedocument.png",
+                uri: this.state.imageOBJ.uri,
+                type: "*/*"
+            })
+        }
 
-        myFormData.append("pan_image", {
-            name: "filedocument.png",
-            uri: this.state.panOBJ.uri,
-            type: "*/*"
-        })
+        if(this.state.apipanObJ != this.state.panOBJ){
+            myFormData.append("pan_image", {
+                name: "filedocument.png",
+                uri: this.state.panOBJ.uri,
+                type: "*/*"
+            })
+        }
+
+        if(this.state.apiadharOBJ[0] != this.state.adharOBJ[0]){
+            myFormData.append("adhar_image_f", {
+                name: "filedocument.png",
+                uri: this.state.adharOBJ[0].uri,
+                type: "*/*"
+            })
+
+            myFormData.append("adhar_image_b", {
+                name: "filedocument.png",
+                uri: this.state.adharOBJ[1].uri,
+                type: "*/*"
+            })
+
+        }
 
         try {
             this.setState({appLoading: true})
@@ -260,31 +280,49 @@ export default class Splash extends React.Component {
 
     onAadharCardClick = () => {
 
-        let options = {
-          storageOptions: {
-            skipBackup: true,
-            path: 'images',
-          },
-        };
-    
-        launchImageLibrary(options, (res) => {
-          console.log('Response = ', res);
-    
-          if (res.didCancel) {
-            this.setState({
-                aadharOBJ:null
-              });
-            console.log('User cancelled image picker');
-          } else if (res.error) {
-            console.log('ImagePicker Error: ', res.error);
-          } else {
-            const source = { uri: res.uri };
-            console.log('response', JSON.stringify(res));
-            this.setState({
-                aadharOBJ:res
-            });
-          }
-        });
+        ImagePicker.openPicker({
+            multiple: true,
+            mediaType :'photo',
+            minFiles:2,
+            maxFiles:2,
+          }).then(images => {
+              if(images.length < 2 ){
+                this.setState({
+                    aadharOBJ:this.state.apiadharOBJ
+                  });
+                Alert.alert(
+                    'Select 2 Photos',
+                    'Aadhar must contain 2 photos !',
+                    [
+                      {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                      {text: 'Try Again', onPress: () =>  this.onAadharCardClick()},
+                    ],
+                    {cancelable: false},
+                  );
+              }
+              if(images.length > 2 ){
+                this.setState({
+                    aadharOBJ:this.state.apiadharOBJ
+                  });
+                Alert.alert(
+                    'Select 2 Photos',
+                    'Aadhar must contain 2 photos !',
+                    [
+                      {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                      {text: 'Try Again', onPress: () =>  this.onAadharCardClick()},
+                    ],
+                    {cancelable: false},
+                  );
+              }
+
+              if(images.length == 2 ){
+                this.setState({
+                    adharOBJ:[{uri:images[0].path},{uri:images[1].path}]
+                });
+              }
+            console.log(images);
+          });
+
     }
 
     onPanCardClick = () => {
@@ -300,7 +338,7 @@ export default class Splash extends React.Component {
           console.log('Response = ', res);
           if (res.didCancel) {
             this.setState({
-                panOBJ:{uri:null}
+                panOBJ:this.state.apipanObJ
               });
             console.log('User cancelled image picker');
           } else if (res.error) {
@@ -568,8 +606,8 @@ export default class Splash extends React.Component {
                 placeholder = "Company Description"
                 placeholderTextColor = "#0000005a"
                 autoCapitalize = "none"
-                value={this.state.cjobexperience}
-                onChangeText={(cjobexperience) => this.setState({cjobexperience})}  />
+                value={this.state.cdesc}
+                onChangeText={(cdesc) => this.setState({cdesc})}  />
             </View>
 
             <View style={{marginHorizontal:20,marginTop:15}}>
@@ -616,6 +654,109 @@ export default class Splash extends React.Component {
                                     <View style={{height:1,borderBottomWidth:1,marginTop:15,borderColor:"#0000003a"}}></View>
 
                                     <Text style={{color:"#0000005a",alignSelf:'center',marginTop:5,backgroundColor:"#4F45F01a",padding:5,borderRadius:5,fontSize:13}}>Upload the following documents to get verified user badge</Text>
+
+
+
+                                    {
+                                        this.state.aadhar_status == 0 && (this.state.adharOBJ[0].uri == null || this.state.adharOBJ[0].uri == 'null' )?
+                                        <TouchableOpacity onPress={this.onAadharCardClick} style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
+                                        <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
+                                        <Icon4 name="address-card" color={"#4F45F0"} size={26} />
+                                        </View>
+                                        <View style={{alignSelf:"center",flex:1,justifyContent:"center"}}>
+                                        <Text style={{fontSize:18,color:"#4F45F0",paddingHorizontal:50}}>Aadhar Card</Text>
+                                        </View>
+                                        </TouchableOpacity>
+                                        :null
+                                    }
+
+                                    {
+                                        this.state.aadhar_status == 0 && this.state.adharOBJ[0].uri != null ?
+                                        <TouchableOpacity onPress={this.onAadharCardClick} style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
+                                        <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
+                                        <Image style={{
+                                                    width: 55,
+                                                    height: 55,
+                                                }}
+                                                source={{uri: `${this.state.adharOBJ[0].uri}`}}/>  
+                                        </View>
+                                        <View style={{alignSelf:"center",flex:1,justifyContent:"center"}}>
+                                        <Text style={{fontSize:18,color:"#4F45F0",paddingHorizontal:50}}>Aadhar Card</Text>
+                                        </View>
+
+                                        </TouchableOpacity>
+                                        :null
+                                    }
+
+                                    {
+                                        this.state.aadhar_status == 1 ?
+                                        <View style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
+                                        <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
+                                        <Icon4 name="clock" color={"#4F45F0"} size={26} />  
+                                        </View>
+                                        <View style={{alignSelf:"center",flex:1,justifyContent:"center"}}>
+                                        <Text style={{fontSize:18,color:"#4F45F0",paddingHorizontal:50}}>Aadhar Card</Text>
+                                        <Text style={{fontSize:12,color:"#4F45F0",paddingHorizontal:50}}>Approval Pending</Text>
+                                        </View>
+
+                                        </View>
+                                        :null
+                                    }
+
+                                    {
+                                        this.state.aadhar_status == 2 ?
+                                        <View style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
+                                        <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
+                                        <Icon8 name="verified" color={"#4F45F0"} size={26} />  
+                                        </View>
+                                        <View style={{alignSelf:"center",flex:1,justifyContent:"center"}}>
+                                        <Text style={{fontSize:18,color:"#4F45F0",paddingHorizontal:50}}>Aadhar Card</Text>
+                                        <Text style={{fontSize:12,color:"#4F45F0",paddingHorizontal:50}}>Approved</Text>
+                                        </View>
+
+                                        </View>
+                                        :null
+                                    }
+
+                                    {
+                                        this.state.aadhar_status == 3 && (this.state.adharOBJ[0].uri == null || this.state.adharOBJ[0].uri == 'null' )?
+                                        <TouchableOpacity onPress={this.onPanCardClick} style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
+                                        <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
+                                        <Icon8 name="do-not-disturb" color={"#4F45F0"} size={26} />  
+                                        </View>
+                                        <View style={{alignSelf:"center",flex:1,justifyContent:"center"}}>
+                                        <Text style={{fontSize:18,color:"#4F45F0",paddingHorizontal:50}}>Aadhar Card</Text>
+                                        <Text style={{fontSize:12,color:"#4F45F0",paddingHorizontal:50}}>Rejected</Text>
+                                        </View>
+                                        </TouchableOpacity>
+                                        :null
+                                    }
+
+                                    {
+                                        this.state.aadhar_status == 3 && this.state.adharOBJ[0].uri != null ?
+                                        <TouchableOpacity onPress={this.onPanCardClick} style={{alignItems:"center",flexDirection:"row",borderRadius:7,marginHorizontal:20,marginTop:15,borderStyle:'dashed',borderWidth:1,borderColor:'#4F45F0',backgroundColor:"#4F45F01a"}}>
+                                        <View style={{marginHorizontal:20,marginVertical:10,backgroundColor:"#fff",height:55,width:55,borderRadius:7,alignItems:"center",justifyContent:"center"}}>
+                                        <Image style={{
+                                                    width: 55,
+                                                    height: 55,
+                                                }}
+                                                source={{uri: `${this.state.adharOBJ[0].uri}`}}/>  
+                                        </View>
+                                        <View style={{alignSelf:"center",flex:1,justifyContent:"center"}}>
+                                        <Text style={{fontSize:18,color:"#4F45F0",paddingHorizontal:50}}>Aadhar Card</Text>
+                                        <Text style={{fontSize:12,color:"#4F45F0",paddingHorizontal:50}}>Rejected</Text>
+                                        </View>
+
+                                        </TouchableOpacity>
+                                        :null
+                                    }
+
+
+
+                                        {/* adsgkadkhsakdhksahdkjsahdhsakdhksahdksahdksahdksahkjdsa */}
+
+
+
 
 
                                     {
@@ -717,8 +858,8 @@ export default class Splash extends React.Component {
  
 
 
-            <TouchableOpacity onPress={this.onUpdateProfileClick}  style={styles.loginButtonContainer}>
-                <Text style={styles.loginButtonText}>Update Profile</Text>
+            <TouchableOpacity onPress={this.onSaveProfileClick}  style={styles.loginButtonContainer}>
+                <Text style={styles.loginButtonText}>Save Profile</Text>
             </TouchableOpacity>
 
             </ScrollView>

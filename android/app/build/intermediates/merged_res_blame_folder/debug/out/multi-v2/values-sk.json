@@ -29,6 +29,23 @@
                         "endColumns": "100",
                         "endOffsets": "2995"
                     }
+                },
+                {
+                    "source": "C:\\Users\\admin\\.gradle\\caches\\transforms-2\\files-2.1\\e3712bc63556439e436b8317b7a0d6f1\\jetified-ucrop-2.2.6-native\\res\\values-sk\\values-sk.xml",
+                    "from": {
+                        "startLines": "2,3,4",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,125,182",
+                        "endColumns": "69,56,50",
+                        "endOffsets": "120,177,228"
+                    },
+                    "to": {
+                        "startLines": "31,32,33",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "3000,3070,3127",
+                        "endColumns": "69,56,50",
+                        "endOffsets": "3065,3122,3173"
+                    }
                 }
             ]
         }

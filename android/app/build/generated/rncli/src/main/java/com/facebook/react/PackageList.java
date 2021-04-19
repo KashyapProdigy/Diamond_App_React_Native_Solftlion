@@ -27,6 +27,8 @@ import com.airbnb.android.react.lottie.LottiePackage;
 import io.expo.appearance.RNCAppearancePackage;
 // react-native-gesture-handler
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+// react-native-image-crop-picker
+import com.reactnative.ivpusic.imagepicker.PickerPackage;
 // react-native-image-picker
 import com.imagepicker.ImagePickerPackage;
 // react-native-reanimated
@@ -90,6 +92,7 @@ public class PackageList {
       new LottiePackage(),
       new RNCAppearancePackage(),
       new RNGestureHandlerPackage(),
+      new PickerPackage(),
       new ImagePickerPackage(),
       new ReanimatedPackage(),
       new SafeAreaContextPackage(),
